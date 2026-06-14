@@ -256,6 +256,16 @@ export function settings(initialTab = 'spotify') {
           ? `<p>Connected${p ? ` as <b>${esc(p.display_name)}</b>${p.product ? ` (${esc(p.product)})` : ''}` : ''}.
              ${p && p.product && p.product !== 'premium' ? '<br><span class="hint" style="color:var(--warn)">In-app playback needs Premium; import and rating work fine without it.</span>' : ''}</p>
              <button class="btn btn-danger" data-disconnect>Disconnect</button>`
+          : auth.hasClientId()
+          ? `<p class="hint">Authorize with your Spotify account to import music, rate, and sync across devices.</p>
+             ${location.hostname === 'localhost' ? '<p class="hint" style="color:var(--warn)">Spotify does not accept "localhost" redirect URIs. Reopen the app at <b>http://127.0.0.1:5500</b> before connecting.</p>' : ''}
+             <button class="btn btn-spotify" data-connect><svg><use href="#i-spotify"/></svg>Connect Spotify</button>
+             <details style="margin-top:14px"><summary class="hint" style="cursor:pointer">Advanced · use your own Spotify app</summary>
+               <div class="form-row" style="margin-top:8px"><label for="set-cid">Client ID</label>
+                 <input id="set-cid" class="input" value="${esc(state.settings.clientId)}" placeholder="leave blank to use the built-in app" autocomplete="off"></div>
+               <div class="form-row"><label>Redirect URI (add this EXACTLY in your Spotify app)</label>
+                 <div class="copy-box"><code>${esc(auth.redirectUri())}</code><button class="btn sm" data-copy>Copy</button></div></div>
+               <p class="hint">To use your own Spotify app: create one at <b>developer.spotify.com/dashboard</b>, add the redirect URI above, check <b>Web API</b> + <b>Web Playback SDK</b>, then paste its Client ID here.</p></details>`
           : `<div class="form-row"><label for="set-cid">Spotify Client ID</label>
                <input id="set-cid" class="input" value="${esc(state.settings.clientId)}" placeholder="32-character client id" autocomplete="off"></div>
              <div class="form-row"><label>Redirect URI (add this EXACTLY in your Spotify app)</label>
@@ -272,8 +282,9 @@ export function settings(initialTab = 'spotify') {
         toast('Redirect URI copied', 'ok');
       });
       body.querySelector('[data-connect]')?.addEventListener('click', () => {
-        setSetting('clientId', body.querySelector('#set-cid').value.trim());
-        if (!state.settings.clientId) return toast('Paste your Client ID first', 'err');
+        const typed = body.querySelector('#set-cid')?.value.trim();
+        if (typed) setSetting('clientId', typed);     // optional override; blank = use baked id
+        if (!auth.hasClientId()) return toast('Paste your Client ID first', 'err');
         auth.connect().catch(e => toast(e.message, 'err'));
       });
       body.querySelector('[data-disconnect]')?.addEventListener('click', () => { auth.disconnect(); show('spotify'); toast('Disconnected'); });

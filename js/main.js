@@ -238,7 +238,9 @@ function doUndo() {
 
 function connectFlow() {
   if (auth.isConnected()) { modals.settings('spotify'); return; }
-  if (!state.settings.clientId) { modals.settings('spotify'); return; }
+  // With a baked-in (or saved) client id, go straight to the Spotify consent
+  // screen. Only fall back to the setup panel when no id exists anywhere.
+  if (!auth.hasClientId()) { modals.settings('spotify'); return; }
   auth.connect().catch(e => toast(e.message, 'err'));
 }
 

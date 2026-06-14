@@ -13,6 +13,14 @@ const SCOPES = [
 
 export const redirectUri = () => location.origin + location.pathname;
 
+// Public PKCE client id for the Spotify app — baked in so users go straight to
+// the consent screen without pasting it. NOT a secret: PKCE has no client secret,
+// and the id is visible in the authorize URL anyway, so it is safe to commit even
+// in a public repo. A user can still override it in Settings → Spotify → Advanced.
+const DEFAULT_CLIENT_ID = 'b6556c5050d4462491e10f27ea78a591';
+export const clientId = () => (state.settings.clientId?.trim() || DEFAULT_CLIENT_ID);
+export const hasClientId = () => !!clientId();
+
 let tokens = null;
 let profile = null;
 try { tokens = JSON.parse(localStorage.getItem(TOKEN_KEY)); } catch { /* ignore */ }
@@ -45,16 +53,16 @@ async function sha256base64url(str) {
 }
 
 export async function connect() {
-  const clientId = state.settings.clientId.trim();
-  if (!clientId) throw new Error('NO_CLIENT_ID');
+  const cid = clientId();
+  if (!cid) throw new Error('NO_CLIENT_ID');
   const verifier = randString();
   // Stash clientId with the verifier AND flush settings now — the redirect below
   // would otherwise kill the debounced persist and lose the clientId.
-  localStorage.setItem(VERIFIER_KEY, JSON.stringify({ verifier, clientId }));
+  localStorage.setItem(VERIFIER_KEY, JSON.stringify({ verifier, clientId: cid }));
   saveNow();
   const challenge = await sha256base64url(verifier);
   const p = new URLSearchParams({
-    client_id: clientId,
+    client_id: cid,
     response_type: 'code',
     redirect_uri: redirectUri(),
     code_challenge_method: 'S256',
@@ -87,17 +95,18 @@ export async function handleCallback() {
   try { stash = JSON.parse(raw); } catch { stash = { verifier: raw }; }
   const verifier = stash?.verifier;
   if (!verifier) throw new Error('Missing PKCE verifier — try connecting again');
-  const clientId = (state.settings.clientId || stash.clientId || '').trim();
-  if (!clientId) throw new Error('Client ID was lost — re-enter it in Settings and connect again');
+  const cid = (state.settings.clientId || stash.clientId || DEFAULT_CLIENT_ID || '').trim();
+  if (!cid) throw new Error('Client ID was lost — re-enter it in Settings and connect again');
   const t = await tokenRequest({
     grant_type: 'authorization_code',
     code,
     redirect_uri: redirectUri(),
-    client_id: clientId,
+    client_id: cid,
     code_verifier: verifier,
   });
   localStorage.removeItem(VERIFIER_KEY);
-  if (state.settings.clientId.trim() !== clientId) setSetting('clientId', clientId);
+  // Persist only a user-supplied override, never the baked default.
+  if (cid !== DEFAULT_CLIENT_ID && state.settings.clientId.trim() !== cid) setSetting('clientId', cid);
   saveTokens(t);
   emit('auth');
   return true;
@@ -108,7 +117,7 @@ export async function refresh() {
   const t = await tokenRequest({
     grant_type: 'refresh_token',
     refresh_token: tokens.refresh_token,
-    client_id: state.settings.clientId.trim(),
+    client_id: clientId(),
   });
   saveTokens(t);
 }
