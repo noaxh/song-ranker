@@ -1,0 +1,20 @@
+# Local tooling / editor
+.claude/
+.vscode/
+*.code-workspace
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Personal data dump (your exported ratings) — don't publish these
+song-ranker-export-*.json
+
+# Node (if ever added)
+node_modules/
+
+# Supabase local state + any secrets
+supabase/.branches/
+supabase/.temp/
+.env
+.env.*

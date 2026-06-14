@@ -1,0 +1,245 @@
+/* ============ Meridian skin ============
+   Apple x Spotify hybrid: deep graphite, liquid glass, specular shine,
+   springy ease-out motion, generous breathing room. Scoped to
+   [data-skin="meridian"] (set by the Meridian theme preset). Layers on top
+   of components.css base + glass.css, the same way skin.css does for v2.
+   Must be linked AFTER glass.css/skin.css — several rules win by cascade order. */
+
+[data-skin="meridian"] {
+  --radius: 18px;
+  --dur: 300ms;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Segoe UI Variable Display', 'Segoe UI', 'Inter', system-ui, sans-serif;
+  --shadow: 0 16px 48px rgb(0 0 0 / .5);
+}
+
+/* Breathing room scales with the density setting (beats themes.css by specificity) */
+[data-skin="meridian"][data-density="compact"]     { --row-h: 44px; --pad: 9px;  }
+[data-skin="meridian"][data-density="cozy"]        { --row-h: 58px; --pad: 14px; }
+[data-skin="meridian"][data-density="comfortable"] { --row-h: 70px; --pad: 18px; }
+
+/* Aurora wash behind everything, independent of the stars/blobs setting */
+[data-skin="meridian"] body {
+  background:
+    radial-gradient(100% 80% at 12% -12%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 55%),
+    radial-gradient(90% 70% at 88% 112%, color-mix(in srgb, var(--accent2) 10%, transparent), transparent 55%),
+    radial-gradient(60% 50% at 70% 18%, color-mix(in srgb, var(--tier-s) 5%, transparent), transparent 60%),
+    var(--bg);
+}
+
+/* One springy motion curve everywhere */
+[data-skin="meridian"] :is(.btn, .btn-icon, .pill, .nav-item, .side-item, .song-row,
+  .song-card, .chip, .tab-btn, .theme-card, .fo-card, .fo-scope, .stat-card, .pb-play) {
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease), transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+/* ---------- Chrome: seamless topbar + sidebar (no glass slabs, hairline seams) ---------- */
+[data-skin="meridian"] .topbar,
+[data-skin="meridian"][data-glass="on"]:not([data-theme="contrast"]) .topbar {
+  background: transparent;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--text) 7%, transparent);
+  padding: 14px 24px;
+}
+[data-skin="meridian"] .sidebar,
+[data-skin="meridian"][data-glass="on"]:not([data-theme="contrast"]) .sidebar {
+  background: transparent;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: none;
+  border-right: 1px solid color-mix(in srgb, var(--text) 6%, transparent);
+  padding: 18px 14px 14px;
+  gap: 26px;
+}
+/* Mobile overlay sidebar needs a real surface to be readable */
+@media (max-width: 920px) {
+  [data-skin="meridian"] .sidebar,
+  [data-skin="meridian"][data-glass="on"]:not([data-theme="contrast"]) .sidebar {
+    background: color-mix(in srgb, var(--bg2) 90%, transparent);
+    -webkit-backdrop-filter: blur(30px) saturate(1.6);
+    backdrop-filter: blur(30px) saturate(1.6);
+  }
+}
+
+/* Brand wordmark: gradient text with a slow shine sweep */
+[data-skin="meridian"] .brand h1 {
+  font-weight: 700; letter-spacing: -.02em;
+  background: linear-gradient(100deg, var(--text) 25%, var(--accent) 45%, var(--accent2) 58%, var(--text) 75%);
+  background-size: 240% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: mer-shine 8s linear infinite;
+}
+@keyframes mer-shine { from { background-position: 0% 0; } to { background-position: -240% 0; } }
+
+/* Search: floating glass capsule */
+[data-skin="meridian"] .search-wrap input {
+  padding: 11px 14px 11px 38px;
+  background: color-mix(in srgb, var(--bg3) 55%, transparent);
+  border-color: color-mix(in srgb, var(--text) 10%, transparent);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+[data-skin="meridian"] .search-wrap input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* Nav: bold Spotify-style labels, soft glass pill when active */
+[data-skin="meridian"] .nav-item {
+  padding: 12px 16px; border-radius: 14px;
+  font-weight: 600; letter-spacing: -.01em;
+}
+[data-skin="meridian"] .nav-item:hover { background: color-mix(in srgb, var(--text) 5%, transparent); transform: translateX(2px); }
+[data-skin="meridian"] .nav-item.is-active {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+}
+[data-skin="meridian"] .nav-item.is-active svg { filter: drop-shadow(0 0 8px currentColor); }
+[data-skin="meridian"] .side-list .side-item { border-radius: 10px; padding: 8px 10px; }
+[data-skin="meridian"] .side-list .side-item.is-active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow: none; color: var(--text);
+}
+
+/* ---------- Buttons: capsules with specular sheen sweep ---------- */
+[data-skin="meridian"] .btn {
+  border-radius: 999px; padding: 9px 18px;
+  position: relative; overflow: hidden;
+  border-color: color-mix(in srgb, var(--text) 12%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent), 0 1px 3px rgb(0 0 0 / .3);
+}
+[data-skin="meridian"] .btn::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(110deg, transparent 25%, color-mix(in srgb, #fff 16%, transparent) 50%, transparent 75%);
+  transform: translateX(-130%);
+  transition: transform .7s var(--ease);
+}
+[data-skin="meridian"] .btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent), 0 8px 24px rgb(0 0 0 / .35);
+}
+[data-skin="meridian"] .btn:hover::after { transform: translateX(130%); }
+[data-skin="meridian"] .btn:active { transform: translateY(0) scale(.97); }
+[data-skin="meridian"] .btn-primary,
+[data-skin="meridian"][data-glass="on"] .btn.btn-primary {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--accent2)));
+  border-color: transparent; color: var(--accent-text);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .25), 0 4px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+[data-skin="meridian"] .btn-icon { transition: background var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+[data-skin="meridian"] .btn-icon:hover { transform: scale(1.1); }
+[data-skin="meridian"] .btn-icon:active { transform: scale(.94); }
+
+[data-skin="meridian"] .pill { padding: 8px 16px; }
+[data-skin="meridian"] .pill.is-active,
+[data-skin="meridian"][data-glass="on"] .pill.is-active {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--accent2)));
+  border-color: transparent; color: var(--accent-text);
+  box-shadow: 0 3px 16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+[data-skin="meridian"] :is(.input, .select) {
+  border-radius: 12px;
+  border-color: color-mix(in srgb, var(--text) 11%, transparent);
+}
+[data-skin="meridian"] .input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* ---------- Main content: room to breathe ---------- */
+[data-skin="meridian"] .main { padding: 22px 32px 130px; }
+[data-skin="meridian"] .filterbar { padding-top: 10px; padding-bottom: 16px; margin-bottom: 12px; gap: 12px; }
+[data-skin="meridian"] .group-header { padding: 22px 8px 12px; }
+[data-skin="meridian"] .group-header h3 { font-size: 1.12rem; font-weight: 700; letter-spacing: -.015em; }
+[data-skin="meridian"] .group-section { border-left-width: 2px; padding-left: 12px; margin-bottom: 16px; }
+[data-skin="meridian"] .empty-state { padding: 110px 20px; gap: 20px; }
+
+/* Rows */
+[data-skin="meridian"] .song-row { border-radius: 14px; padding: 0 12px; }
+[data-skin="meridian"] .song-row:hover { box-shadow: 0 4px 18px rgb(0 0 0 / .25); }
+[data-skin="meridian"] .song-row .art { border-radius: 10px; box-shadow: 0 3px 10px rgb(0 0 0 / .4); }
+[data-skin="meridian"] .song-row.is-playing { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+[data-skin="meridian"] .tier-chip { border-radius: 9px; }
+[data-skin="meridian"] .rating-in { box-shadow: inset 0 1px 2px rgb(0 0 0 / .25); }
+
+/* Cards */
+[data-skin="meridian"] .card-grid { gap: 20px; padding: 12px 0; grid-template-columns: repeat(auto-fill, minmax(182px, 1fr)); }
+[data-skin="meridian"] .song-card { border-radius: 20px; padding: 14px; }
+[data-skin="meridian"] .song-card:hover {
+  transform: translateY(-5px); border-color: transparent;
+  box-shadow: 0 18px 44px rgb(0 0 0 / .45), 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+[data-skin="meridian"] .song-card .art { border-radius: 14px; box-shadow: 0 6px 18px rgb(0 0 0 / .4); }
+
+/* Stats */
+[data-skin="meridian"] .stats-grid { gap: 16px; }
+[data-skin="meridian"] .stat-card { border-radius: 18px; padding: 20px; }
+[data-skin="meridian"] .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgb(0 0 0 / .35); }
+[data-skin="meridian"] .rank-row { border-radius: 14px; padding: 10px 14px; }
+
+/* ---------- Modals / menus / toasts ---------- */
+[data-skin="meridian"] .modal {
+  border-radius: 26px;
+  animation: mer-pop .45s var(--ease);
+  box-shadow: 0 32px 90px rgb(0 0 0 / .6), 0 0 0 1px color-mix(in srgb, #fff 8%, transparent);
+}
+@keyframes mer-pop { from { transform: translateY(18px) scale(.965); opacity: 0; } }
+[data-skin="meridian"] .modal-head { padding: 20px 26px; border-bottom-color: color-mix(in srgb, var(--text) 8%, transparent); }
+[data-skin="meridian"] .modal-body { padding: 22px 26px; gap: 18px; }
+[data-skin="meridian"] .modal-foot { padding: 16px 26px; border-top-color: color-mix(in srgb, var(--text) 8%, transparent); }
+[data-skin="meridian"] .tab-row { padding: 0 26px; gap: 8px; border-bottom-color: color-mix(in srgb, var(--text) 8%, transparent); }
+[data-skin="meridian"] .tab-btn.is-active { color: var(--text); border-bottom-color: var(--accent); }
+[data-skin="meridian"] .ctx-menu { border-radius: 16px; padding: 6px; animation: mer-pop .25s var(--ease); }
+[data-skin="meridian"] .ctx-menu button { border-radius: 10px; padding: 9px 12px; }
+[data-skin="meridian"] .toast { border-radius: 16px; border-left-width: 3px; animation: mer-pop .4s var(--ease); }
+[data-skin="meridian"] .theme-card { border-radius: 16px; }
+[data-skin="meridian"] .theme-card .tc-preview { border-radius: 10px; }
+
+/* ---------- Player: floating glass capsule, Apple Music style ---------- */
+[data-skin="meridian"] .playerbar {
+  margin: 8px 16px 16px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  padding: 12px 20px;
+}
+[data-skin="meridian"][data-glass="on"]:not([data-theme="contrast"]) .playerbar {
+  background: color-mix(in srgb, var(--bg2) 52%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(28px) saturate(1.8);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 15%, transparent), 0 16px 48px rgb(0 0 0 / .5);
+}
+[data-skin="meridian"] .playerbar img { border-radius: 10px; box-shadow: 0 4px 14px rgb(0 0 0 / .5); }
+[data-skin="meridian"] .pb-play {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .14), 0 4px 20px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+[data-skin="meridian"] .pb-play:hover { transform: scale(1.08); }
+[data-skin="meridian"] .pb-play:active { transform: scale(.95); }
+
+/* ---------- Face-off: more drama ---------- */
+[data-skin="meridian"] .fo-card { border-radius: 28px; }
+[data-skin="meridian"] .fo-card:hover, [data-skin="meridian"] .fo-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--accent) 26%, transparent);
+}
+[data-skin="meridian"] .fo-card .art { border-radius: 18px; box-shadow: 0 10px 28px rgb(0 0 0 / .5); }
+[data-skin="meridian"] .fo-vs {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-size: 1.7rem;
+}
+[data-skin="meridian"] .fo-scope { border-radius: 16px; padding: 16px; }
+
+/* ---------- Scrollbars: thin, quiet ---------- */
+[data-skin="meridian"] ::-webkit-scrollbar { width: 8px; height: 8px; }
+[data-skin="meridian"] ::-webkit-scrollbar-track { background: transparent; }
+[data-skin="meridian"] ::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text2) 30%, transparent);
+  border-radius: 99px; border: 2px solid transparent; background-clip: content-box;
+}
+[data-skin="meridian"] ::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--text2) 55%, transparent); }

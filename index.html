@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight" data-density="cozy" data-glass="on">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Song Ranker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/themes.css?v=3">
+<link rel="stylesheet" href="css/main.css?v=3">
+<link rel="stylesheet" href="css/components.css?v=3">
+<link rel="stylesheet" href="css/glass.css?v=3">
+<link rel="stylesheet" href="css/skin.css?v=3">
+<link rel="stylesheet" href="css/meridian.css?v=1">
+<link rel="stylesheet" href="css/home.css?v=3">
+</head>
+<body>
+<script>
+// If the module graph fails to load (usually a stale-cache mix after an update),
+// surface it instead of leaving a dead page.
+window.addEventListener('error', function (e) {
+  if (window.__srBooted || document.getElementById('boot-fail')) return;
+  var d = document.createElement('div');
+  d.id = 'boot-fail';
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:14px 18px;font:14px/1.5 sans-serif';
+  d.innerHTML = '<b>Song Ranker failed to start.</b> Usually a stale cache after an update — press <b>Ctrl+F5</b> (hard refresh). ' +
+    'If it persists, the error was: <code style="background:#0008;padding:2px 6px;border-radius:4px">' +
+    String(e.message || e.error || 'unknown').replace(/</g, '&lt;') + '</code>';
+  document.body.appendChild(d);
+}, true);
+</script>
+<div class="bg-blobs" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="bg-stars" id="bg-stars" aria-hidden="true"></div>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.1a1 1 0 0 1 1.5-.9l11 6.9a1 1 0 0 1 0 1.7l-11 6.9A1 1 0 0 1 8 18.9z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.1a1 1 0 0 1 1.5-.9l9.5 6.4v-5.1a1 1 0 0 1 2 0v13a1 1 0 0 1-2 0v-5.1L6.5 19.8A1 1 0 0 1 5 18.9z"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5.1a1 1 0 0 0-1.5-.9L8 10.6V5.5a1 1 0 0 0-2 0v13a1 1 0 0 0 2 0v-5.1l9.5 6.4a1 1 0 0 0 1.5-.9z"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 2h8.6a2 2 0 0 1 1.4.6l9.4 9.4a2 2 0 0 1 0 2.8L16.8 20a2 2 0 0 1-2.8 0L4.6 10.6A2 2 0 0 1 4 9.2V2z" transform="translate(0 1)"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 8l5-5 5 5"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></symbol>
+    <symbol id="i-spotify" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.5 17.3c-.2.4-.7.5-1.1.3-2.9-1.8-6.6-2.2-10.9-1.2-.4.1-.8-.2-.9-.6-.1-.4.2-.8.6-.9 4.7-1.1 8.8-.6 12 1.3.4.2.5.7.3 1.1zm1.5-3.3c-.3.4-.9.6-1.3.3-3.4-2.1-8.5-2.7-12.5-1.5-.5.1-1-.1-1.2-.6-.1-.5.1-1 .6-1.2 4.6-1.4 10.2-.7 14.1 1.7.4.3.6.9.3 1.3zm.1-3.4C15.2 8.3 8.8 8.1 5.2 9.2c-.6.2-1.2-.2-1.4-.7-.2-.6.2-1.2.7-1.4 4.3-1.3 11.3-1.1 15.8 1.6.5.3.7 1 .4 1.5-.3.4-1 .6-1.5.3z"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-rows" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16m0-16L3 8m4-4 4 4"/><path d="M17 20V4m0 16-4-4m4 4 4-4"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.7s6 6.3 6 10.3a6 6 0 0 1-12 0c0-4 6-10.3 6-10.3z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="11"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-13h-7l1-7z"/></symbol>
+    <symbol id="i-tiers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="11" width="13" height="4" rx="1"/><rect x="3" y="18" width="8" height="4" rx="1"/></symbol>
+    <symbol id="i-playlist" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="14" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="10" y2="18"/><line x1="18" y1="13" x2="18" y2="21"/><line x1="14" y1="17" x2="22" y2="17"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-repeat-one" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4" stroke-width="2.2"/></symbol>
+    <symbol id="i-queue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="15" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/><path d="M16 18V9l5 2.5z" fill="currentColor"/></symbol>
+    <symbol id="i-rank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h10M3 12h7M3 18h5"/><path d="M18 21V8m0 0-3.2 3.2M18 8l3.2 3.2"/></symbol>
+  </defs>
+</svg>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="app" id="app">
+  <header class="topbar">
+    <button class="btn-icon" id="btn-sidebar" aria-label="Toggle sidebar"><svg><use href="#i-menu"/></svg></button>
+    <div class="brand"><svg class="brand-ic"><use href="#i-music"/></svg><h1>Song&nbsp;Ranker</h1></div>
+    <div class="search-wrap">
+      <svg><use href="#i-search"/></svg>
+      <input type="search" id="search" placeholder="Search songs, artists, albums…  ( / )" aria-label="Search library">
+    </div>
+    <div class="top-actions">
+      <label class="sr-only" for="sort-by">Sort by</label>
+      <select id="sort-by" class="select" title="Sort by">
+        <option value="custom">Custom order</option>
+        <option value="rating">Rating</option>
+        <option value="name">Title</option>
+        <option value="artist">Artist</option>
+        <option value="album">Album</option>
+        <option value="duration">Duration</option>
+        <option value="listens">Listens</option>
+        <option value="added" selected>Date added</option>
+      </select>
+      <button class="btn-icon" id="sort-dir" aria-label="Toggle sort direction" title="Sort direction"><svg><use href="#i-sort"/></svg></button>
+      <button class="btn-icon" id="layout-toggle" aria-label="Toggle row / card layout" title="Rows / Cards"><svg><use href="#i-grid"/></svg></button>
+      <button class="btn-icon" id="btn-undo" aria-label="Undo (U)" title="Undo (U)"><svg><use href="#i-undo"/></svg></button>
+      <button class="btn btn-ghost" id="btn-import" aria-label="Import music"><svg><use href="#i-download"/></svg><span>Import</span></button>
+      <button class="btn btn-spotify" id="btn-connect" aria-label="Spotify account"><svg><use href="#i-spotify"/></svg><span>Connect</span></button>
+      <button class="btn-icon" id="btn-settings" aria-label="Settings" title="Settings"><svg><use href="#i-settings"/></svg></button>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <nav aria-label="Views">
+      <button class="nav-item is-active" data-view="home"><svg><use href="#i-home"/></svg>Home</button>
+      <button class="nav-item" data-view="library"><svg><use href="#i-music"/></svg>Library</button>
+      <button class="nav-item" data-view="faceoff"><svg><use href="#i-zap"/></svg>Face-off</button>
+      <button class="nav-item" data-view="rank"><svg><use href="#i-rank"/></svg>Quick Rank</button>
+      <button class="nav-item" data-view="ranks"><svg><use href="#i-trophy"/></svg>Leaderboard</button>
+      <button class="nav-item" data-view="stats"><svg><use href="#i-chart"/></svg>Stats</button>
+    </nav>
+    <div class="side-sec">
+      <header><h2 role="button" tabindex="0" aria-expanded="true" data-side-sec="groups"><svg class="sec-chev"><use href="#i-chevron"/></svg><svg><use href="#i-folder"/></svg>Groups</h2><button class="btn-icon sm" id="btn-add-group" aria-label="New group"><svg><use href="#i-plus"/></svg></button></header>
+      <ul id="group-list" class="side-list"></ul>
+    </div>
+    <div class="side-sec">
+      <header><h2 role="button" tabindex="0" aria-expanded="true" data-side-sec="tags"><svg class="sec-chev"><use href="#i-chevron"/></svg><svg><use href="#i-tag"/></svg>Tags</h2><button class="btn-icon sm" id="btn-add-tag" aria-label="New tag"><svg><use href="#i-plus"/></svg></button></header>
+      <ul id="tag-list" class="side-list"></ul>
+    </div>
+    <div class="side-sec" id="playlist-sec">
+      <header><h2 role="button" tabindex="0" aria-expanded="true" data-side-sec="playlists"><svg class="sec-chev"><use href="#i-chevron"/></svg><svg><use href="#i-spotify"/></svg>Playlists</h2><button class="btn-icon sm" id="btn-refresh-pls" aria-label="Refresh playlists" title="Refresh playlists"><svg><use href="#i-refresh"/></svg></button></header>
+      <ul id="playlist-list" class="side-list"></ul>
+    </div>
+    <div class="side-foot">
+      <button class="btn btn-ghost sm" id="btn-shortcuts"><svg><use href="#i-keyboard"/></svg>Shortcuts</button>
+      <button class="btn btn-ghost sm" id="btn-theme"><svg><use href="#i-palette"/></svg>Themes</button>
+    </div>
+  </aside>
+
+  <main class="main" id="main" tabindex="-1">
+    <div class="filterbar" id="filterbar">
+      <div class="pill-row" role="tablist" aria-label="Group by">
+        <button class="pill is-active" data-gm="none" role="tab">All</button>
+        <button class="pill" data-gm="artist" role="tab">By Artist</button>
+        <button class="pill" data-gm="genre" role="tab">By Genre</button>
+        <button class="pill" data-gm="album" role="tab">By Album</button>
+        <button class="pill" data-gm="tag" role="tab">By Tag</button>
+        <button class="pill" data-gm="group" role="tab">My Groups</button>
+      </div>
+      <div class="filter-right">
+        <select id="rated-filter" class="select sm" aria-label="Song filter">
+          <option value="all">All songs</option>
+          <option value="rated">Rated only</option>
+          <option value="unrated">Unrated only</option>
+          <option value="noted">With notes</option>
+          <option value="tagged">Tagged</option>
+          <option value="untagged">Untagged</option>
+          <option value="played">Played</option>
+          <option value="unplayed">Never played</option>
+        </select>
+        <div class="range-filter">
+          <input type="number" id="min-rating" class="input num" min="1" max="1000" value="1" aria-label="Minimum rating">
+          <span>–</span>
+          <input type="number" id="max-rating" class="input num" min="1" max="1000" value="1000" aria-label="Maximum rating">
+        </div>
+        <button class="btn btn-ghost sm" id="btn-clear-filters">Clear</button>
+      </div>
+      <div class="active-tags" id="active-tag-filters" aria-label="Active tag filters"></div>
+    </div>
+    <div id="view" class="view" role="list" aria-label="Song library"></div>
+  </main>
+
+  <div class="bulk-bar" id="bulk-bar" hidden>
+    <span id="bulk-count"></span>
+    <button class="btn sm" data-bulk="rate">Rate…</button>
+    <button class="btn sm" data-bulk="tag">Tag…</button>
+    <button class="btn sm" data-bulk="group">Group…</button>
+    <button class="btn sm" data-bulk="playlist">Playlist…</button>
+    <button class="btn sm btn-danger" data-bulk="remove">Remove</button>
+    <button class="btn-icon sm" data-bulk="clear" aria-label="Clear selection"><svg><use href="#i-x"/></svg></button>
+  </div>
+
+  <footer class="playerbar" id="playerbar" hidden>
+    <div class="pb-left">
+      <img id="pb-art" alt="" hidden>
+      <div class="pb-meta"><div id="pb-name"></div><div id="pb-artist"></div></div>
+    </div>
+    <div class="pb-center">
+      <div class="pb-controls">
+        <button class="btn-icon pb-mode" id="pb-shuffle" aria-label="Shuffle off" title="Shuffle"><svg><use href="#i-shuffle"/></svg></button>
+        <button class="btn-icon" id="pb-prev" aria-label="Previous track"><svg><use href="#i-prev"/></svg></button>
+        <button class="btn-icon pb-play" id="pb-toggle" aria-label="Play or pause"><svg><use href="#i-play"/></svg></button>
+        <button class="btn-icon" id="pb-next" aria-label="Next track"><svg><use href="#i-next"/></svg></button>
+        <button class="btn-icon pb-mode" id="pb-repeat" aria-label="Repeat off" title="Repeat"><svg><use href="#i-repeat"/></svg></button>
+      </div>
+      <div class="pb-seek">
+        <span id="pb-cur">0:00</span>
+        <input type="range" id="pb-seek" min="0" max="1000" value="0" aria-label="Seek position">
+        <span id="pb-dur">0:00</span>
+      </div>
+    </div>
+    <div class="pb-right">
+      <button class="btn-icon pb-mode" id="pb-more" aria-label="Song options" aria-haspopup="menu" title="Song options"><svg><use href="#i-dots"/></svg></button>
+      <button class="btn-icon pb-mode" id="pb-queue" aria-label="Show queue" title="Up next"><svg><use href="#i-queue"/></svg></button>
+      <svg class="vol-ic"><use href="#i-volume"/></svg>
+      <input type="range" id="pb-vol" min="0" max="100" value="70" aria-label="Volume">
+    </div>
+    <div class="pb-queue-pop" id="pb-queue-pop" role="listbox" aria-label="Up next" hidden></div>
+  </footer>
+</div>
+
+<div id="modal-root"></div>
+<div id="ctx-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+<div id="sr-live" class="sr-only" aria-live="polite" role="status"></div>
+
+<script>
+if (location.protocol === 'file:') {
+  document.body.innerHTML = '<div style="font-family:sans-serif;padding:40px;max-width:560px;margin:auto;color:#eee;background:#111;border-radius:12px;margin-top:10vh">' +
+  '<h1>Run via local server</h1><p>Spotify login and ES modules need an http origin. Double-click <b>Launch Song Ranker.bat</b> in this folder, or run:</p>' +
+  '<pre style="background:#000;padding:12px;border-radius:8px">npx -y http-server -a 127.0.0.1 -p 5500 -c-1</pre><p>then open <a style="color:#7c9cff" href="http://127.0.0.1:5500">http://127.0.0.1:5500</a></p></div>';
+}
+</script>
+<script type="module" src="js/main.js?v=4"></script>
+</body>
+</html>

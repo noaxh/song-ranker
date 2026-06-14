@@ -1,0 +1,73 @@
+song ranker:
+filter feature broken. behaviorial issues **DONE**
+
+face off needs to be richer in content: choosing what types of "battles" youre doing. single genre, group, artist, playlist,
+
+get ready for GitHub import updates button. plan for one more user, want user to see my updated data without having to connect online or download a new build each time. 
+expansion on above: button at the top nav that says "whats on the other side of the mirror...?" which switches it so non editable view of other persons data. switches to second user (which will switch between since theres only 2)
+
+compare feature to compare both users
+
+drag and drop songs around the list + filter to auto snap them to be ordered in terms of rank. switching back to custom order will remember your order.
+
+import artist ---> top 10 doesn't work. fix the import data feature.
+
+tournament bracket mode for face off
+
+turn the original rating from 2 digits to 3, with 1000 being best. **DONE**
+^change ss icon to be special
+
+richer in features bottom music player
+
+top left menu button does nothing.
+
+add home page like spotify. your trending music, albums, new releases, your artists, etc. other home page features too
+
+filter bar still there when in face off menu.
+
+add user spotify playlist view to left sidebar, like spotify.
+
+when playing songs on webapp, upon song end, have next song play, add shuffle, and repeat.
+
+appearance needs more customization AND better looks
+looks good but needs overhaul on a lot of components
+before making changes, save pre overhaul look as a theme option labeled "legacy"
+
+
+create quest system. + prestige system. 
+prestige road where the more plays, the more you unlock.
+rewards / cosmetics vary from borders, to appearance animations in duels, to win animations, to lose animations, to passive animations / aura.
+the more prestiged a song is, the more it will go up in prestige (new icon/bubble) iron, gold, diamond, emerald, sapphire, ruby, crystal, opal, amethyst, rainbow.
+
+quests give gems to buy crates (gacha) that can have cosmetics. 
+
+art style is anime/pixel slightly.
+
+prestige map / road will be constellation style, with stars.
+
+
+
+search on update kicks you out of search bar
+
+
+
+C:\Users\6342626\OneDrive - Cégep Heritage College\Desktop\claude summer project\song-ranker
+
+create quest system. + prestige system. 
+prestige road where the more plays, the more you unlock.
+rewards / cosmetics vary from borders, to appearance animations in duels, to win animations, to lose animations, to passive animations / aura.
+the more prestiged a song is, the more it will go up in prestige (new icon/bubble) iron, gold, diamond, emerald, sapphire, ruby, crystal, opal, amethyst, rainbow.
+
+quests give gems to buy crates (gacha) that can have cosmetics. 
+
+art style is anime/pixel slightly.
+
+prestige map / road will be constellation style, with stars.
+----------------------
+
+develop this idea into a fully functioning system, thats well planned out. dont design any cosmetics. only the system.
+
+add the same right-click dropdown in library to leaderboard and face off and quick rank
+
+
+

@@ -1,0 +1,9 @@
+# Supabase project config for Song Ranker.
+# `project_id` is overwritten when you run `supabase link --project-ref <your-ref>`.
+# verify_jwt = false: the function is publicly invocable, and auth is the Spotify
+# token it verifies server-side. So the browser sends no anon key — only the
+# function URL + the user's Spotify token.
+project_id = "song-ranker"
+
+[functions.song-ranker-sync]
+verify_jwt = false
