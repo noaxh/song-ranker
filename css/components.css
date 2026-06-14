@@ -65,7 +65,7 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 
 .song-row {
   display: grid;
-  grid-template-columns: 24px 24px 24px var(--col-art, var(--row-h)) minmax(180px, 2fr) minmax(0, 1.2fr) 48px minmax(0, 1fr) 52px var(--col-tier, 34px) 64px 34px;
+  grid-template-columns: 24px 24px var(--col-art, var(--row-h)) minmax(180px, 2fr) minmax(0, 1.2fr) 48px minmax(0, 1fr) 52px var(--col-tier, 34px) 64px;
   align-items: center; gap: 10px;
   height: var(--row-h);
   padding: 0 8px;
@@ -91,11 +91,11 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 .art-ph { display: flex; align-items: center; justify-content: center; color: var(--text2); }
 .art-ph svg { width: 45%; height: 45%; }
 @media (max-width: 1100px) {
-  .song-row { grid-template-columns: 24px 24px 24px var(--col-art, var(--row-h)) minmax(140px, 1fr) 48px 52px var(--col-tier, 34px) 64px 34px; }
+  .song-row { grid-template-columns: 24px 24px var(--col-art, var(--row-h)) minmax(140px, 1fr) 48px 52px var(--col-tier, 34px) 64px; }
   .song-row .t-album, .song-row .t-tags { display: none; }
 }
 @media (max-width: 640px) {
-  .song-row { grid-template-columns: 24px 24px var(--col-art, var(--row-h)) minmax(120px, 1fr) var(--col-tier, 34px) 64px 34px; }
+  .song-row { grid-template-columns: 24px var(--col-art, var(--row-h)) minmax(120px, 1fr) var(--col-tier, 34px) 64px; }
   .song-row .t-dur, .song-row .t-listens, .song-row .drag-handle { display: none; }
 }
 
@@ -106,6 +106,8 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 
 .play-btn { color: var(--text2); }
 .play-btn:hover { color: var(--accent2); }
+/* Keep the play control visible (showing the pause icon) while its track plays. */
+.song-card .play-btn.is-playing { opacity: 1; color: var(--accent2); }
 
 .t-block { min-width: 0; }
 .t-name { font-weight: 500; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

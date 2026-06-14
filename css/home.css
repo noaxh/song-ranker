@@ -70,6 +70,8 @@
   transition: opacity var(--dur), transform var(--dur);
 }
 .h-tile:hover .h-play, .h-tile:focus-within .h-play { opacity: 1; }
+/* While its track is playing, the button stays visible showing the pause icon. */
+.h-play.is-playing { opacity: 1; background: var(--accent); }
 .h-play:hover { background: var(--accent); transform: scale(1.08); }
 .h-getchip { align-self: flex-start; border: 1px solid var(--accent); color: var(--accent); background: transparent; }
 .h-tile:hover .h-getchip { background: var(--accent); color: var(--accent-text); }

@@ -361,7 +361,7 @@ function bindChrome() {
     if (e.key === '/') { e.preventDefault(); $('#search').focus(); }
     else if (e.key === 'u' && !e.ctrlKey) { e.preventDefault(); doUndo(); }
     else if (e.key === '?') { e.preventDefault(); shortcutsModal(); }
-    else if (e.key === 'a' && (e.ctrlKey || e.metaKey) && document.activeElement?.closest('#view')) {
+    else if (e.key === 'a' && (e.ctrlKey || e.metaKey) && state.settings.view === 'library') {
       e.preventDefault(); views.selectAll();
     }
   });

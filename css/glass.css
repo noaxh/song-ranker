@@ -193,6 +193,8 @@
   color: var(--text2); opacity: 0; transition: opacity var(--dur), color var(--dur), border-color var(--dur);
 }
 .fo-card:hover .fo-play, .fo-card .fo-play:focus-visible { opacity: 1; }
+/* While its track is playing, the button stays visible showing the pause icon. */
+.fo-card .fo-play.is-playing { opacity: 1; color: var(--accent2); border-color: var(--accent2); }
 .fo-card .fo-play:hover { color: var(--accent2); border-color: var(--accent2); }
 @media (hover: none) { .fo-card .fo-play { opacity: .85; } }
 

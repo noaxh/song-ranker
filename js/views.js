@@ -11,13 +11,14 @@ let lastFocusId = null;
 const expanded = {};       // bucketKey -> extra rows shown
 let digitBuf = '';         // quick-rate digit buffer
 let digitTimer = null;
+let clickTimer = null;     // defers single-click play so a double-click can open details
 export let lastBuckets = [];
 
 export const getSelection = () => [...sel];
 // Ids passing the current filters, in custom order (Face-off uses this as its pool).
 export function visibleIds() { return state.order.filter(id => state.songs[id] && visible(state.songs[id])); }
 export function clearSelection() { sel.clear(); syncSelectionUi(); }
-export function selectAll() { flatIds.forEach(id => sel.add(id)); syncSelectionUi(); }
+export function selectAll() { visibleIds().forEach(id => sel.add(id)); syncSelectionUi(); }
 
 // ---------- filtering ----------
 function visible(s) {
@@ -165,7 +166,6 @@ function rowHtml(s, idx, playingUri) {
       aria-label="${esc(s.name)} by ${esc(s.artists.map(a => a.name).join(', '))}${s.rating != null ? ', rated ' + s.rating : ', unrated'}">
     <button class="drag-handle" tabindex="-1" aria-hidden="true"><svg><use href="#i-grip"/></svg></button>
     <span class="row-idx">${idx}</span>
-    <input type="checkbox" class="row-check" ${sel.has(s.id) ? 'checked' : ''} aria-label="Select ${esc(s.name)}">
     ${s.album.img
       ? `<img class="art" src="${esc(s.album.img)}" alt="" loading="lazy">`
       : '<span class="art art-ph"><svg><use href="#i-music"/></svg></span>'}
@@ -179,18 +179,18 @@ function rowHtml(s, idx, playingUri) {
     <span class="t-dur">${fmtMs(s.durationMs)}</span>
     <span class="tier-chip" ${tb ? `data-tier="${tb}"` : ''} aria-hidden="true">${st.showTiers && tier ? tier : ''}</span>
     ${ratingInput(s)}
-    <button class="btn-icon sm" data-menu aria-label="Options for ${esc(s.name)}" aria-haspopup="menu"><svg><use href="#i-dots"/></svg></button>
   </div>`;
 }
 
 function cardHtml(s) {
   const tier = tierOf(s.rating);
+  const playing = s.uri && player.nowPlayingUri() === s.uri;
   return `<div class="song-card ${sel.has(s.id) ? 'is-selected' : ''}" data-id="${esc(s.id)}" role="listitem" tabindex="0" draggable="true"
       aria-label="${esc(s.name)} by ${esc(s.artists.map(a => a.name).join(', '))}">
     ${s.album.imgLg || s.album.img
       ? `<img class="art" src="${esc(s.album.imgLg || s.album.img)}" alt="" loading="lazy">`
       : '<span class="art art-ph"><svg><use href="#i-music"/></svg></span>'}
-    <button class="btn-icon play-btn" data-play aria-label="Play ${esc(s.name)}"><svg><use href="#i-play"/></svg></button>
+    <button class="btn-icon play-btn${playing ? ' is-playing' : ''}" data-play aria-label="${playing ? 'Pause' : 'Play'} ${esc(s.name)}"><svg><use href="#i-${playing ? 'pause' : 'play'}"/></svg></button>
     <div class="t-block">
       <div class="t-name">${esc(s.name)}</div>
       <div class="t-art">${esc(s.artists.map(a => a.name).join(', '))}</div>
@@ -330,10 +330,7 @@ export function render() {
 
 function syncSelectionUi() {
   $$('#view [data-id]').forEach(el => {
-    const has = sel.has(el.dataset.id);
-    el.classList.toggle('is-selected', has);
-    const cb = el.querySelector('.row-check');
-    if (cb) cb.checked = has;
+    el.classList.toggle('is-selected', sel.has(el.dataset.id));
   });
   const bar = $('#bulk-bar');
   bar.hidden = sel.size === 0;
@@ -367,6 +364,14 @@ export async function playFrom(id) {
   }
 }
 
+// Plain click on a song toggles playback: the loaded track pauses/resumes; any
+// other track starts playing (queued from its bucket).
+function togglePlay(id) {
+  const s = state.songs[id];
+  if (s && s.uri && player.currentUri() === s.uri) player.toggle();
+  else playFrom(id);
+}
+
 // ---------- event wiring (once) ----------
 export function initViews() {
   const root = $('#view');
@@ -388,25 +393,26 @@ export function initViews() {
     const item = e.target.closest('[data-id]');
     if (!item) return;
     const id = item.dataset.id;
-    if (e.target.closest('[data-play], .play-btn')) { playFrom(id); return; }
-    if (e.target.closest('[data-menu]')) {
-      const r = e.target.closest('[data-menu]').getBoundingClientRect();
-      emit('ctx-menu', { x: r.left, y: r.bottom + 4, ids: sel.has(id) ? [...sel] : [id] });
+    // Explicit play button (cards) → immediate play/pause toggle.
+    if (e.target.closest('[data-play], .play-btn')) { clearTimeout(clickTimer); togglePlay(id); return; }
+    // Ctrl / Cmd / Shift click builds a multi-selection for the bulk-action bar.
+    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+      if (e.target.closest('input, button, a')) return;
+      clearTimeout(clickTimer);
+      handleSelectClick(id, e);
       return;
     }
-    if (e.target.closest('.row-check')) {
-      e.target.checked ? sel.add(id) : sel.delete(id);
-      lastClickedId = id;
-      syncSelectionUi();
-      return;
-    }
+    // Leave the rating box and other inline controls to handle their own clicks.
     if (e.target.closest('input, button, a')) return;
-    handleSelectClick(id, e);
+    // Plain left-click plays the song. Defer briefly so a double-click (open
+    // details) can cancel it instead of firing playback then opening the modal.
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => togglePlay(id), 200);
   });
 
   root.addEventListener('dblclick', e => {
     const item = e.target.closest('[data-id]');
-    if (item && !e.target.closest('input, button')) emit('song-detail', item.dataset.id);
+    if (item && !e.target.closest('input, button')) { clearTimeout(clickTimer); emit('song-detail', item.dataset.id); }
   });
 
   root.addEventListener('contextmenu', e => {

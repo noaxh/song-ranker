@@ -19,12 +19,13 @@ function greeting() {
 
 // ---------- tiles ----------
 function songTile(s) {
+  const playing = s.uri && player.nowPlayingUri() === s.uri;
   return `<div class="h-tile" data-hid="${esc(s.id)}" role="button" tabindex="0"
       aria-label="${esc(s.name)} by ${esc(s.artists.map(a => a.name).join(', '))}">
     ${s.album.imgLg || s.album.img
       ? `<img class="art" src="${esc(s.album.imgLg || s.album.img)}" alt="" loading="lazy">`
       : '<span class="art art-ph"><svg><use href="#i-music"/></svg></span>'}
-    ${s.uri ? `<button class="btn-icon h-play" data-h-play="${esc(s.id)}" aria-label="Play ${esc(s.name)}"><svg><use href="#i-play"/></svg></button>` : ''}
+    ${s.uri ? `<button class="btn-icon h-play${playing ? ' is-playing' : ''}" data-h-play="${esc(s.id)}" aria-label="${playing ? 'Pause' : 'Play'} ${esc(s.name)}"><svg><use href="#i-${playing ? 'pause' : 'play'}"/></svg></button>` : ''}
     <div class="h-name">${esc(s.name)}</div>
     <div class="h-sub">${esc(s.artists[0]?.name || '')}</div>
     ${s.rating != null ? `<span class="rating-in has-val h-rate" style="--rv:${s.rating};pointer-events:none">${s.rating}</span>` : ''}
@@ -131,7 +132,9 @@ export function init() {
     if (play) {
       e.stopPropagation();
       const s = state.songs[play.dataset.hPlay];
-      if (s?.uri) player.playList([s], 0).catch(err => toast(err.message, 'err'));
+      if (!s?.uri) return;
+      if (player.currentUri() === s.uri) player.toggle();
+      else player.playList([s], 0).catch(err => toast(err.message, 'err'));
       return;
     }
     const tile = e.target.closest('[data-hid]');

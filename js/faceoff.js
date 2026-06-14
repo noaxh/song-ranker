@@ -72,10 +72,11 @@ export function duelCard(s, side, result) {
   const win = result && result.winnerId === s.id;
   const lose = result && result.winnerId !== s.id;
   const delta = result ? (win ? result.dW : result.dL) : null;
+  const playing = s.uri && player.nowPlayingUri() === s.uri;
   return `<div class="fo-card ${win ? `fo-win fo-strike-${side}` : ''} ${lose ? `fo-defeat-${side}` : ''}"
       data-fo-pick="${esc(s.id)}" role="button" tabindex="0"
       aria-label="Pick ${esc(s.name)} by ${esc(s.artists.map(a => a.name).join(', '))}">
-    ${s.uri ? `<button class="btn-icon fo-play" data-fo-play="${esc(s.uri)}" aria-label="Play ${esc(s.name)}" title="Listen before you judge"><svg><use href="#i-play"/></svg></button>` : ''}
+    ${s.uri ? `<button class="btn-icon fo-play${playing ? ' is-playing' : ''}" data-fo-play="${esc(s.uri)}" aria-label="${playing ? 'Pause' : 'Play'} ${esc(s.name)}" title="Listen before you judge"><svg><use href="#i-${playing ? 'pause' : 'play'}"/></svg></button>` : ''}
     ${s.album.imgLg || s.album.img
       ? `<img class="art" src="${esc(s.album.imgLg || s.album.img)}" alt="">`
       : '<span class="art art-ph"><svg style="width:40px;height:40px"><use href="#i-music"/></svg></span>'}
@@ -90,8 +91,11 @@ export function duelCard(s, side, result) {
   </div>`;
 }
 
-// Play one track from a duel card without treating the click as a vote.
+// Play one track from a duel card without treating the click as a vote. Clicking
+// the play button again while that track is loaded pauses/resumes it.
 export function playUri(uri) {
+  if (!uri) return;
+  if (player.currentUri() === uri) { player.toggle(); return; }
   player.playList([uri]).catch(e => emit('toast', { msg: e.message, type: 'err' }));
 }
 

@@ -4,7 +4,20 @@ All notable changes to Song Ranker are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/).
 
-## [1.1.0] — 2026-06-14
+## [1.2.0] - 2026-06-14
+
+### Added
+- **Play / pause from song tiles.** Clicking the play button on a track that is
+  already playing now pauses it, and the icon flips between play and pause. Works
+  on the home shelves and the face-off duel cards.
+
+### Changed
+- **Library rows are click-to-play.** Left-click a song to play it, right-click
+  to open its menu. The per-row checkbox and the three-dot menu button are gone.
+  Build a multi-selection with Ctrl or Shift click, or select everything in the
+  current view with Ctrl+A; the bulk-action bar is unchanged.
+
+## [1.1.0] - 2026-06-14
 
 ### Added
 - **Cloud sync (Supabase).** Optional cross-device backup of your library, keyed
@@ -20,7 +33,7 @@ All notable changes to Song Ranker are documented here. Format follows
 ### Changed
 - Now distributed as a standalone repository, deployable to GitHub Pages.
 
-## [1.0.0] — 2026-06-11
+## [1.0.0] - 2026-06-11
 
 ### Added
 - Initial release. Spotify (PKCE) import — liked songs, playlists, top tracks,
@@ -29,4 +42,5 @@ All notable changes to Song Ranker are documented here. Format follows
   Leaderboard and stats dashboard. In-app Web Playback (Premium). Nine theme
   presets plus a custom theme editor. Local-first storage with JSON export/import.
 
+[1.2.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.2.0
 [1.1.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.1.0
