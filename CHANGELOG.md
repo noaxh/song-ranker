@@ -1,0 +1,32 @@
+# Changelog
+
+All notable changes to Song Ranker are documented here. Format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
+[Semantic Versioning](https://semver.org/).
+
+## [1.1.0] — 2026-06-14
+
+### Added
+- **Cloud sync (Supabase).** Optional cross-device backup of your library, keyed
+  to your Spotify account. A Supabase Edge Function verifies your Spotify token
+  server-side, so the database is never exposed to the browser. Auto-syncs after
+  changes; manual Sync / Upload / Download in **Settings → Data**. (Requires
+  deploying the `song-ranker-sync` function — see the `supabase/` folder.)
+- **One-click Spotify connect.** The app's Spotify Client ID is built in, so new
+  users go straight to the consent screen instead of pasting a 32-character ID.
+  A bring-your-own-app override lives under **Settings → Spotify → Advanced**.
+- JSON export / import surfaced as a real backup workflow in **Settings → Data**.
+
+### Changed
+- Now distributed as a standalone repository, deployable to GitHub Pages.
+
+## [1.0.0] — 2026-06-11
+
+### Added
+- Initial release. Spotify (PKCE) import — liked songs, playlists, top tracks,
+  by artist, and search. Rate songs 1–1000 with S–F tiers, tags, custom groups,
+  drag-and-drop ordering, and face-off / quick-rank / tournament modes.
+  Leaderboard and stats dashboard. In-app Web Playback (Premium). Nine theme
+  presets plus a custom theme editor. Local-first storage with JSON export/import.
+
+[1.1.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.1.0
