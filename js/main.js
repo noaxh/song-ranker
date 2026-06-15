@@ -18,6 +18,9 @@ import { toast, ctxMenu, shortcutsModal, confirm } from './ui.js';
 import * as modals from './modals.js';
 import { importModal } from './import.js';
 import * as cloud from './cloud.js';
+import * as friends from './friends.js';
+import * as friendsView from './friends-view.js';
+import * as compare from './compare.js';
 
 // Reset target for "Clear filters" — keep grouping in here so genre/group views
 // are exitable via Clear, not just via the All pill.
@@ -29,6 +32,8 @@ function renderAll() {
   else if (state.settings.view === 'faceoff') faceoff.render();
   else if (state.settings.view === 'rank') rank.render();
   else if (state.settings.view === 'ranks') leaderboard.render();
+  else if (state.settings.view === 'friends') friendsView.render();
+  else if (state.settings.view === 'compare') compare.render();
   else if (state.settings.view === 'home') home.render();
   else views.render();
   renderSidebar();
@@ -58,6 +63,9 @@ function syncControls() {
   syncVal('#min-rating', s.minRating);
   syncVal('#max-rating', s.maxRating);
   $$('.nav-item').forEach(n => n.classList.toggle('is-active', n.dataset.view === s.view));
+  // Friends nav badge: count of incoming requests.
+  const fb = $('#nav-friends-badge');
+  if (fb) { const n = friends.incomingCount(); fb.textContent = n || ''; fb.hidden = !n; }
   // Filters only make sense in the library — face-off has its own battle scopes now.
   $('#filterbar').style.display = s.view === 'library' ? '' : 'none';
   $('#app').classList.toggle('sb-collapsed', !!s.sidebarCollapsed);
@@ -282,7 +290,10 @@ function bindChrome() {
 
   $('.sidebar nav').addEventListener('click', e => {
     const n = e.target.closest('[data-view]');
-    if (n) { setSetting('view', n.dataset.view); $('#sidebar').classList.remove('open'); }
+    if (n) {
+      if (n.dataset.view === 'friends') friendsView.showList(); // open the list, not a stale profile
+      setSetting('view', n.dataset.view); $('#sidebar').classList.remove('open');
+    }
   });
   $('#group-list').addEventListener('click', e => {
     const g = e.target.closest('[data-group]');
@@ -368,7 +379,7 @@ function bindChrome() {
 }
 
 function bindBus() {
-  on('songs groups tags settings auth player playlists', renderSoon);
+  on('songs groups tags settings auth player playlists friends', renderSoon);
   on('toast', d => toast(d.msg, d.type));
   on('ctx-menu', showSongMenu);
   on('song-detail', id => modals.songDetail(id));
@@ -422,6 +433,7 @@ function bindDnd() {
 
 // ---------- boot ----------
 load();
+friends.load();        // paint cached friends/profile before the network confirms
 themes.apply();
 themes.initStars();
 views.initViews();
@@ -429,6 +441,8 @@ faceoff.init();
 rank.init();
 tourney.init();
 leaderboard.init();
+friendsView.init();
+compare.init();
 home.init();
 player.bindBarControls();
 // Player-bar "more" button → the same right-click song menu, on the current track.
@@ -459,10 +473,14 @@ window.__srBooted = true; // signals the boot-failure banner that modules loaded
       if (p.product && p.product !== 'premium') toast('Heads up: in-app playback needs Spotify Premium. Importing and rating work regardless.', 'info', 6000);
       // Profile id is now known — pull the cloud library and merge it in.
       cloud.syncOnConnect().catch(() => {});
+      // Friends: ensure a profile row exists, then load the friend list. Profile
+      // sync first so any inbound edge already has a row to reference.
+      friends.syncProfile().then(() => friends.refresh()).then(() => friends.prefetchLibraries()).catch(() => {});
     }).catch(() => {});
     refreshPlaylists();
     syncPlays();
     setInterval(syncPlays, 180000);
+    setInterval(() => { if (auth.isConnected()) friends.refresh().then(() => friends.prefetchLibraries()).catch(() => {}); }, 180000);
     // Genres are fetched once at import time; if that call failed (expired token,
     // network, closed tab mid-import) nothing retried — so retry unresolved artists here.
     lib.enrichGenres().catch(e => console.warn('genre enrichment failed', e));

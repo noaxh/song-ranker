@@ -215,7 +215,42 @@ const CLOUD_SQL = `create table if not exists public.libraries (
 );
 alter table public.libraries enable row level security;
 -- No anon/authenticated policies on purpose: the browser can never reach this
--- table. All access goes through the song-ranker-sync Edge Function.`;
+-- table. All access goes through the song-ranker-sync Edge Function.
+
+-- ---- Friends (optional; needed only for the Friends feature) ----
+create table if not exists public.profiles (
+  spotify_user_id text primary key,
+  username        text,
+  display_name    text,
+  avatar_url      text,
+  library_public  boolean not null default true,
+  findable        boolean not null default true,
+  song_count      int,
+  rated_count     int,
+  avg_rating      int,
+  top_song        text,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
+);
+-- case-insensitive unique handle; multiple NULLs are allowed by Postgres
+create unique index if not exists profiles_username_lower_idx on public.profiles (lower(username));
+
+create table if not exists public.friendships (
+  id            uuid primary key default gen_random_uuid(),
+  requester_id  text not null references public.profiles(spotify_user_id) on delete cascade,
+  addressee_id  text not null references public.profiles(spotify_user_id) on delete cascade,
+  status        text not null default 'pending', -- pending | accepted | declined | blocked
+  created_at    timestamptz not null default now(),
+  responded_at  timestamptz,
+  unique (requester_id, addressee_id)
+);
+create index if not exists friendships_addressee_idx on public.friendships (addressee_id, status);
+create index if not exists friendships_requester_idx on public.friendships (requester_id, status);
+
+alter table public.profiles    enable row level security;
+alter table public.friendships enable row level security;
+-- Same model: no client policies. Only the Edge Function (service role) touches
+-- these, and it verifies your Spotify token first.`;
 
 function cloudStatusLine() {
   const st = cloud.getStatus();

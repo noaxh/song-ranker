@@ -5,11 +5,13 @@ import { $, esc, tierOf, tierBase } from './utils.js';
 
 let filter = 'all'; // 'all' | 'tested' (3+ duels)
 
-function entries() {
-  const list = state.order
-    .map(id => state.songs[id])
+// Pure entry list from any snapshot — used by the live view (global state) AND by
+// the read-only friend profile (a friend's snapshot).
+function entriesFrom(songs, order, mode) {
+  const list = (order || [])
+    .map(id => songs[id])
     .filter(s => s && s.rating != null);
-  const scoped = filter === 'tested' ? list.filter(s => (s.duels || 0) >= 3) : list;
+  const scoped = mode === 'tested' ? list.filter(s => (s.duels || 0) >= 3) : list;
   // Rating first; battle record breaks ties so proven songs outrank untested ones.
   return scoped.sort((a, b) => b.rating - a.rating
     || (b.wins || 0) - (a.wins || 0)
@@ -62,9 +64,31 @@ function rowHtml(s, rank) {
   </div>`;
 }
 
+// Read-only leaderboard markup for the friend profile. Pure: no #view, no
+// handlers, no rating inputs — just the podium + ranked rows from a snapshot.
+export function buildLeaderboard({ songs, order }, { filter: mode = 'all' } = {}) {
+  const list = entriesFrom(songs || {}, order || Object.keys(songs || {}), mode);
+  if (!list.length) return '<p class="hint">No rated songs in this library yet.</p>';
+  const podium = list.slice(0, 3);
+  const rest = list.slice(3);
+  const totalWins = list.reduce((n, s) => n + (s.wins || 0), 0);
+  return `<div class="leaderboard">
+    <div class="lb-head">
+      <h2><svg><use href="#i-trophy"/></svg>Leaderboard</h2>
+      <span class="hint">${list.length} song${list.length === 1 ? '' : 's'} ranked · ${totalWins} duel${totalWins === 1 ? '' : 's'} won</span>
+    </div>
+    ${podium.length === 3
+      ? `<div class="lb-podium">${podiumCard(podium[1], 2)}${podiumCard(podium[0], 1)}${podiumCard(podium[2], 3)}</div>`
+      : `<div class="lb-list">${podium.map((s, i) => rowHtml(s, i + 1)).join('')}</div>`}
+    ${rest.length || podium.length === 3
+      ? `<div class="lb-list">${(podium.length === 3 ? rest : []).map((s, i) => rowHtml(s, i + 4)).join('')}</div>`
+      : ''}
+  </div>`;
+}
+
 export function render() {
   const root = $('#view');
-  const list = entries();
+  const list = entriesFrom(state.songs, state.order, filter);
 
   if (!list.length) {
     root.innerHTML = `<div class="empty-state"><svg><use href="#i-trophy"/></svg>

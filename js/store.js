@@ -302,10 +302,12 @@ export function setArtistGenres(map) {
   Object.assign(state.artistGenres, map);
   touch('songs');
 }
-export function songGenres(song) {
+// `artistGenres` defaults to the global map but can be passed a friend's map so
+// read-only friend views resolve genres against the friend's data, not yours.
+export function songGenres(song, artistGenres = state.artistGenres) {
   const out = [];
   for (const a of song.artists) {
-    for (const g of state.artistGenres[a.id] || []) if (!out.includes(g)) out.push(g);
+    for (const g of (artistGenres[a.id] || [])) if (!out.includes(g)) out.push(g);
   }
   return out.length ? out : ['Unknown genre'];
 }

@@ -33,8 +33,9 @@ let status = { state: 'off', msg: '', at: 0 };
 export const getStatus = () => status;
 function setStatus(s, msg = '') { status = { state: s, msg, at: Date.now() }; emit('cloud', status); }
 
-// Single transport: POST {action, token, data} to the Edge Function.
-async function call(action, data) {
+// Single transport: POST {action, token, data} to the Edge Function. Exported so
+// the friends layer (social.js) can reuse the same verified-token channel.
+export async function call(action, data) {
   if (!isConfigured()) throw new Error('Cloud sync isn’t set up yet — deploy the function (Settings → Data).');
   const token = await auth.getToken();
   if (!token) throw new Error('Connect Spotify first — sync is keyed to your account.');

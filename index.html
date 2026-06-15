@@ -9,11 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/themes.css?v=3">
 <link rel="stylesheet" href="css/main.css?v=3">
-<link rel="stylesheet" href="css/components.css?v=4">
+<link rel="stylesheet" href="css/components.css?v=5">
 <link rel="stylesheet" href="css/glass.css?v=4">
 <link rel="stylesheet" href="css/skin.css?v=3">
 <link rel="stylesheet" href="css/meridian.css?v=1">
 <link rel="stylesheet" href="css/home.css?v=4">
+<link rel="stylesheet" href="css/friends.css?v=1">
 </head>
 <body>
 <script>
@@ -77,6 +78,7 @@ window.addEventListener('error', function (e) {
     <symbol id="i-repeat-one" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4" stroke-width="2.2"/></symbol>
     <symbol id="i-queue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="15" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="11" y2="18"/><path d="M16 18V9l5 2.5z" fill="currentColor"/></symbol>
     <symbol id="i-rank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h10M3 12h7M3 18h5"/><path d="M18 21V8m0 0-3.2 3.2M18 8l3.2 3.2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   </defs>
 </svg>
 
@@ -117,6 +119,7 @@ window.addEventListener('error', function (e) {
       <button class="nav-item" data-view="faceoff"><svg><use href="#i-zap"/></svg>Face-off</button>
       <button class="nav-item" data-view="rank"><svg><use href="#i-rank"/></svg>Quick Rank</button>
       <button class="nav-item" data-view="ranks"><svg><use href="#i-trophy"/></svg>Leaderboard</button>
+      <button class="nav-item" data-view="friends"><svg><use href="#i-users"/></svg>Friends<span class="nav-badge" id="nav-friends-badge" hidden></span></button>
       <button class="nav-item" data-view="stats"><svg><use href="#i-chart"/></svg>Stats</button>
     </nav>
     <div class="side-sec">
@@ -222,6 +225,6 @@ if (location.protocol === 'file:') {
   '<pre style="background:#000;padding:12px;border-radius:8px">npx -y http-server -a 127.0.0.1 -p 5500 -c-1</pre><p>then open <a style="color:#7c9cff" href="http://127.0.0.1:5500">http://127.0.0.1:5500</a></p></div>';
 }
 </script>
-<script type="module" src="js/main.js?v=5"></script>
+<script type="module" src="js/main.js?v=7"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 import { state, songGenres, setRating, adjustRating, emit, moveIds } from './store.js';
 import { $, $$, esc, fmtMs, tierOf, tierBase, announce, clamp, hashHue, TIER_ORDER } from './utils.js';
 import * as player from './player.js';
+import * as friends from './friends.js';
 
 const RENDER_CAP = 300;
 const sel = new Set();
@@ -150,6 +151,26 @@ function tagChips(s) {
   }).join('');
 }
 
+// Mini friend avatars for songs a friend has also rated. Sits in its own row
+// column (reserved only when friend ratings exist — see render's has-fr toggle).
+// Each avatar carries the friend's rating in its title for hover, plus a "!" tag.
+function friendRatingCell(songId) {
+  const fr = friends.friendsForSong(songId);
+  if (!fr.length) return '<span class="t-friends"></span>';
+  const avs = fr.slice(0, 3).map(f => {
+    const lbl = f.username || f.display_name || 'Friend';
+    const title = `${lbl} rated this ${f.rating}`;
+    const pic = f.avatar_url
+      ? `<img src="${esc(f.avatar_url)}" alt="">`
+      : `<span class="fr-ph">${esc(lbl.slice(0, 1).toUpperCase())}</span>`;
+    return `<span class="fr-av" tabindex="0" title="${esc(title)}" aria-label="${esc(title)}">${pic}<span class="fr-bang" aria-hidden="true">!</span></span>`;
+  }).join('');
+  const more = fr.length > 3
+    ? `<span class="fr-more" title="${esc(fr.map(f => `${f.username || f.display_name}: ${f.rating}`).join(', '))}">+${fr.length - 3}</span>`
+    : '';
+  return `<span class="t-friends">${avs}${more}</span>`;
+}
+
 function ratingInput(s) {
   const has = s.rating != null;
   return `<input class="rating-in ${has ? 'has-val' : ''}" type="number" inputmode="numeric" min="1" max="1000"
@@ -174,6 +195,7 @@ function rowHtml(s, idx, playingUri) {
       <div class="t-art">${esc(s.artists.map(a => a.name).join(', '))}</div>
     </div>
     <div class="t-album">${esc(s.album.name)}</div>
+    ${friendRatingCell(s.id)}
     <span class="t-listens ${s.listens ? '' : 'none'}" title="${s.listens || 0} play${s.listens === 1 ? '' : 's'} on Spotify (any device, tracked since import)"><svg><use href="#i-play"/></svg>${s.listens || 0}</span>
     <div class="t-tags">${tagChips(s)}</div>
     <span class="t-dur">${fmtMs(s.durationMs)}</span>
@@ -269,6 +291,7 @@ export function render() {
 
   root.classList.toggle('no-art', !st.showArt);
   root.classList.toggle('no-tiers', !st.showTiers);
+  root.classList.toggle('has-fr', friends.hasAnyFriendRatings());
 
   if (!Object.keys(state.songs).length) {
     root.innerHTML = `<div class="empty-state">

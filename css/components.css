@@ -65,7 +65,7 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 
 .song-row {
   display: grid;
-  grid-template-columns: 24px 24px var(--col-art, var(--row-h)) minmax(180px, 2fr) minmax(0, 1.2fr) 48px minmax(0, 1fr) 52px var(--col-tier, 34px) 64px;
+  grid-template-columns: 24px 24px var(--col-art, var(--row-h)) minmax(180px, 2fr) minmax(0, 1.2fr) var(--col-fr, 0px) 48px minmax(0, 1fr) 52px var(--col-tier, 34px) 64px;
   align-items: center; gap: 10px;
   height: var(--row-h);
   padding: 0 8px;
@@ -92,7 +92,7 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 .art-ph svg { width: 45%; height: 45%; }
 @media (max-width: 1100px) {
   .song-row { grid-template-columns: 24px 24px var(--col-art, var(--row-h)) minmax(140px, 1fr) 48px 52px var(--col-tier, 34px) 64px; }
-  .song-row .t-album, .song-row .t-tags { display: none; }
+  .song-row .t-album, .song-row .t-tags, .song-row .t-friends { display: none; }
 }
 @media (max-width: 640px) {
   .song-row { grid-template-columns: 24px var(--col-art, var(--row-h)) minmax(120px, 1fr) var(--col-tier, 34px) 64px; }
@@ -103,6 +103,34 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 .view.no-art .song-row .art { display: none; }
 .view.no-tiers { --col-tier: 0px; }
 .view.no-tiers .song-row .tier-chip { display: none; }
+/* Reserve the friend-rating column only when a friend has rated something. */
+.view.has-fr { --col-fr: 30px; }
+
+/* Friend-rating indicator: mini avatar(s) with a "!" tag; rating on hover (title). */
+.t-friends { display: flex; align-items: center; }
+.fr-av {
+  position: relative; width: 22px; height: 22px; border-radius: 50%;
+  margin-left: -7px; cursor: default; outline: none;
+}
+.fr-av:first-child { margin-left: 0; }
+.fr-av:hover, .fr-av:focus-visible { z-index: 2; }
+.fr-av:focus-visible { box-shadow: 0 0 0 2px var(--accent); border-radius: 50%; }
+.fr-av img, .fr-av .fr-ph {
+  width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: block;
+  border: 2px solid var(--bg); background: var(--bg3);
+}
+.fr-av .fr-ph {
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem; font-weight: 700; color: var(--accent-text, #fff); background: var(--accent);
+}
+.fr-bang {
+  position: absolute; top: -3px; right: -3px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent2); color: var(--bg);
+  font-size: .6rem; font-weight: 800; line-height: 12px; text-align: center;
+  border: 1.5px solid var(--bg);
+}
+.fr-more { font-size: .66rem; color: var(--text2); margin-left: 3px; font-weight: 600; cursor: default; }
 
 .play-btn { color: var(--text2); }
 .play-btn:hover { color: var(--accent2); }

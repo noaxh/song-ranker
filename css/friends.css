@@ -1,0 +1,107 @@
+/* ============ Friends, friend profile, compare ============ */
+
+/* nav badge (incoming request count) */
+.nav-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px; margin-left: auto;
+  border-radius: 999px; background: var(--accent); color: var(--accent-text, #fff);
+  font-size: .68rem; font-weight: 700; line-height: 1;
+}
+
+/* ---- view shell ---- */
+.fv-wrap, .friend-profile, .cmp-head { max-width: 1100px; margin: 0 auto; }
+.fv-head, .cmp-head {
+  display: flex; align-items: center; gap: 12px; padding: 6px 2px 14px;
+}
+.fv-head h2, .cmp-head h2 { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+.fv-head h2 svg, .cmp-head h2 svg { width: 22px; height: 22px; color: var(--accent); }
+.cmp-head { justify-content: space-between; }
+.fv-body { padding-top: 6px; }
+.fv-sec { margin: 0 0 22px; }
+.fv-sec h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+
+/* ---- friend cards ---- */
+.fv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.fv-card {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg2); transition: border-color var(--dur);
+}
+.fv-card:hover { border-color: var(--accent); }
+.fv-card-id { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.fv-card-meta { min-width: 0; }
+.fv-name { font-weight: 600; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fv-card-meta .hint { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fv-top { color: var(--accent2) !important; }
+.fv-card-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.fv-card-actions .btn { flex: 1 1 auto; justify-content: center; }
+.fv-card-actions .btn-icon { flex: 0 0 auto; }
+
+/* ---- avatars ---- */
+.fv-avatar, .fp-avatar {
+  width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex: none; background: var(--bg3);
+}
+.fv-avatar-ph, .fp-avatar-ph {
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .9rem; color: var(--accent-text, #fff);
+  background: var(--accent);
+}
+.fp-avatar, .fp-avatar-ph { width: 64px; height: 64px; font-size: 1.2rem; }
+
+/* ---- requests ---- */
+.fv-req {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg2); margin-bottom: 8px;
+}
+.fv-req-actions { display: flex; gap: 8px; align-items: center; }
+.fv-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px;
+  background: var(--accent); color: var(--accent-text, #fff); font-size: .66rem; font-weight: 700;
+}
+
+/* ---- add tab ---- */
+.fv-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.fv-inline .input { flex: 1 1 220px; min-width: 0; }
+.fv-check { display: flex; gap: 9px; align-items: center; padding: 5px 0; font-size: .9rem; cursor: pointer; }
+
+/* ---- friend profile ---- */
+.fp-head {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 4px 2px 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
+}
+.fp-id { display: flex; align-items: center; gap: 14px; min-width: 0; margin-right: auto; }
+.fp-name { font-size: 1.3rem; font-weight: 700; }
+.fp-sections > section { margin-bottom: 26px; }
+.fp-head [data-fp-back] svg { width: 14px; height: 14px; }
+
+/* ---- compare ---- */
+.cmp-top { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.cmp-score { text-align: center; flex: none; }
+.cmp-score-v { font-size: 3.2rem; font-weight: 800; line-height: 1; color: var(--accent); }
+.cmp-score-v span { font-size: 1.4rem; font-weight: 700; }
+.cmp-score-l { font-size: .82rem; color: var(--text2); text-transform: uppercase; letter-spacing: .04em; }
+.cmp-score.none .cmp-score-v { color: var(--text2); }
+.cmp-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.cmp-chip {
+  display: flex; flex-direction: column; gap: 2px; align-items: center;
+  padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg2);
+}
+.cmp-chip-v { font-size: 1.2rem; font-weight: 700; }
+.cmp-chip-l { font-size: .72rem; color: var(--text2); }
+.cmp-disclaimer { margin: 8px 2px 18px; }
+.cmp-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+.cmp-sec h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+.cmp-list { display: flex; flex-direction: column; gap: 4px; }
+.cmp-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 7px 10px; border-radius: calc(var(--radius) - 3px); background: var(--bg2);
+}
+.cmp-row .t-block { min-width: 0; }
+.cmp-pair { font-size: .82rem; color: var(--text2); white-space: nowrap; }
+.cmp-pair b { color: var(--text); }
+
+@media (max-width: 720px) {
+  .cmp-cols { grid-template-columns: 1fr; }
+}
