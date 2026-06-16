@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/themes.css?v=3">
-<link rel="stylesheet" href="css/main.css?v=3">
-<link rel="stylesheet" href="css/components.css?v=5">
+<link rel="stylesheet" href="css/main.css?v=4">
+<link rel="stylesheet" href="css/components.css?v=7">
 <link rel="stylesheet" href="css/glass.css?v=4">
 <link rel="stylesheet" href="css/skin.css?v=3">
 <link rel="stylesheet" href="css/meridian.css?v=1">
@@ -92,19 +92,6 @@ window.addEventListener('error', function (e) {
       <input type="search" id="search" placeholder="Search songs, artists, albums…  ( / )" aria-label="Search library">
     </div>
     <div class="top-actions">
-      <label class="sr-only" for="sort-by">Sort by</label>
-      <select id="sort-by" class="select" title="Sort by">
-        <option value="custom">Custom order</option>
-        <option value="rating">Rating</option>
-        <option value="name">Title</option>
-        <option value="artist">Artist</option>
-        <option value="album">Album</option>
-        <option value="duration">Duration</option>
-        <option value="listens">Listens</option>
-        <option value="added" selected>Date added</option>
-      </select>
-      <button class="btn-icon" id="sort-dir" aria-label="Toggle sort direction" title="Sort direction"><svg><use href="#i-sort"/></svg></button>
-      <button class="btn-icon" id="layout-toggle" aria-label="Toggle row / card layout" title="Rows / Cards"><svg><use href="#i-grid"/></svg></button>
       <button class="btn-icon" id="btn-undo" aria-label="Undo (U)" title="Undo (U)"><svg><use href="#i-undo"/></svg></button>
       <button class="btn btn-ghost" id="btn-import" aria-label="Import music"><svg><use href="#i-download"/></svg><span>Import</span></button>
       <button class="btn btn-spotify" id="btn-connect" aria-label="Spotify account"><svg><use href="#i-spotify"/></svg><span>Connect</span></button>
@@ -138,7 +125,7 @@ window.addEventListener('error', function (e) {
       <button class="btn btn-ghost sm" id="btn-shortcuts"><svg><use href="#i-keyboard"/></svg>Shortcuts</button>
       <button class="btn btn-ghost sm" id="btn-theme"><svg><use href="#i-palette"/></svg>Themes</button>
     </div>
-    <a class="hint" id="app-version" href="https://github.com/noaxh/song-ranker/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="What's new: changelog" style="display:block;text-align:center;padding:6px 8px;text-decoration:none">v1.2.0</a>
+    <a class="hint" id="app-version" href="https://github.com/noaxh/song-ranker/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="What's new: changelog" style="display:block;text-align:center;padding:6px 8px;text-decoration:none">v1.3.0</a>
   </aside>
 
   <main class="main" id="main" tabindex="-1">
@@ -152,24 +139,15 @@ window.addEventListener('error', function (e) {
         <button class="pill" data-gm="group" role="tab">My Groups</button>
       </div>
       <div class="filter-right">
-        <select id="rated-filter" class="select sm" aria-label="Song filter">
-          <option value="all">All songs</option>
-          <option value="rated">Rated only</option>
-          <option value="unrated">Unrated only</option>
-          <option value="noted">With notes</option>
-          <option value="tagged">Tagged</option>
-          <option value="untagged">Untagged</option>
-          <option value="played">Played</option>
-          <option value="unplayed">Never played</option>
-        </select>
-        <div class="range-filter">
-          <input type="number" id="min-rating" class="input num" min="1" max="1000" value="1" aria-label="Minimum rating">
-          <span>–</span>
-          <input type="number" id="max-rating" class="input num" min="1" max="1000" value="1000" aria-label="Maximum rating">
-        </div>
-        <button class="btn btn-ghost sm" id="btn-clear-filters">Clear</button>
+        <button class="btn sm" id="btn-sort" aria-haspopup="menu" aria-expanded="false" title="Sort">
+          <svg><use href="#i-sort"/></svg><span id="sort-label">Date added</span><svg class="btn-caret"><use href="#i-chevron"/></svg>
+        </button>
+        <button class="btn-icon" id="layout-toggle" aria-label="Toggle row / card layout" title="Rows / Cards"><svg><use href="#i-grid"/></svg></button>
+        <button class="btn sm" id="btn-filter" aria-haspopup="dialog" aria-expanded="false" title="Filter">
+          <svg><use href="#i-filter"/></svg><span>Filter</span><span class="filter-badge" id="filter-badge" hidden>0</span>
+        </button>
       </div>
-      <div class="active-tags" id="active-tag-filters" aria-label="Active tag filters"></div>
+      <div class="active-tags" id="active-filters" aria-label="Active filters"></div>
     </div>
     <div id="view" class="view" role="list" aria-label="Song library"></div>
   </main>
@@ -225,6 +203,6 @@ if (location.protocol === 'file:') {
   '<pre style="background:#000;padding:12px;border-radius:8px">npx -y http-server -a 127.0.0.1 -p 5500 -c-1</pre><p>then open <a style="color:#7c9cff" href="http://127.0.0.1:5500">http://127.0.0.1:5500</a></p></div>';
 }
 </script>
-<script type="module" src="js/main.js?v=7"></script>
+<script type="module" src="js/main.js?v=10"></script>
 </body>
 </html>

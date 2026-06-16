@@ -4,6 +4,22 @@ All notable changes to Song Ranker are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-06-16
+
+### Added
+- **Filter popover.** Every library filter now lives behind one **Filter** button in
+  the sub-bar: status, a two-handle rating-range slider (replacing the old number
+  boxes), and tags (the five most-recent, with **See all** opening the full list).
+  Active filters appear as removable chips, and the button shows a count badge.
+
+### Changed
+- **Sort and layout moved into the library sub-bar.** The top bar is now just search,
+  import, connect, and settings. Sort opens a menu with the field list and an
+  ascending / descending toggle.
+- **The filter sub-bar auto-hides on scroll.** It slides away as you scroll down and
+  returns when you scroll up or reach the top, with a frosted backing so the controls
+  stay legible over the song list.
+
 ## [1.2.0] - 2026-06-14
 
 ### Added
@@ -42,5 +58,6 @@ All notable changes to Song Ranker are documented here. Format follows
   Leaderboard and stats dashboard. In-app Web Playback (Premium). Nine theme
   presets plus a custom theme editor. Local-first storage with JSON export/import.
 
+[1.3.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.3.0
 [1.2.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.2.0
 [1.1.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.1.0

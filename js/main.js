@@ -14,7 +14,7 @@ import * as home from './home.js';
 import * as player from './player.js';
 import * as dnd from './dnd.js';
 import * as lib from './library.js';
-import { toast, ctxMenu, shortcutsModal, confirm } from './ui.js';
+import { toast, ctxMenu, shortcutsModal, confirm, openModal } from './ui.js';
 import * as modals from './modals.js';
 import { importModal } from './import.js';
 import * as cloud from './cloud.js';
@@ -25,6 +25,19 @@ import * as compare from './compare.js';
 // Reset target for "Clear filters" — keep grouping in here so genre/group views
 // are exitable via Clear, not just via the All pill.
 const CLEARED_FILTERS = { search: '', filterTags: [], ratedFilter: 'all', minRating: 1, maxRating: 1000, groupMode: 'none', collapsed: {} };
+
+// Sort fields (value → label) for the sub-bar Sort menu and its button label.
+const SORT_FIELDS = [
+  ['custom', 'Custom order'], ['rating', 'Rating'], ['name', 'Title'], ['artist', 'Artist'],
+  ['album', 'Album'], ['duration', 'Duration'], ['listens', 'Listens'], ['added', 'Date added'],
+];
+// Status options for the filter popover (mirror of the old #rated-filter select).
+const RATED_LABELS = {
+  all: 'All songs', rated: 'Rated only', unrated: 'Unrated only', noted: 'With notes',
+  tagged: 'Tagged', untagged: 'Untagged', played: 'Played', unplayed: 'Never played',
+};
+// "Clear all" inside the filter popover — wipes filter facets but keeps group-by + sort.
+const FILTER_CLEAR = { ratedFilter: 'all', filterTags: [], minRating: 1, maxRating: 1000 };
 
 // ---------- render orchestration ----------
 function renderAll() {
@@ -51,23 +64,24 @@ function syncControls() {
     if (el !== document.activeElement && el.value !== String(val)) el.value = val;
   };
   syncVal('#search', s.search);
-  syncVal('#sort-by', s.sortBy);
-  $('#sort-dir').style.transform = s.sortDir === 'asc' ? 'scaleY(-1)' : '';
+  $('#sort-label').textContent = (SORT_FIELDS.find(f => f[0] === s.sortBy) || [, 'Sort'])[1];
   const nextLayout = { rows: ['grid', 'Switch to cards'], cards: ['tiers', 'Switch to tier board'], tiers: ['rows', 'Switch to rows'] }[s.layout] || ['grid', 'Switch layout'];
   $('#layout-toggle').innerHTML = `<svg><use href="#i-${nextLayout[0]}"/></svg>`;
   $('#layout-toggle').title = nextLayout[1];
   $('#layout-toggle').setAttribute('aria-label', nextLayout[1]);
   $('#btn-undo').disabled = !canUndo();
   $$('#filterbar .pill[data-gm]').forEach(p => p.classList.toggle('is-active', p.dataset.gm === s.groupMode));
-  syncVal('#rated-filter', s.ratedFilter);
-  syncVal('#min-rating', s.minRating);
-  syncVal('#max-rating', s.maxRating);
+  const fcount = filterCount();
+  $('#btn-filter').classList.toggle('has-filters', fcount > 0);
+  const fbadge = $('#filter-badge');
+  fbadge.textContent = fcount; fbadge.hidden = fcount === 0;
   $$('.nav-item').forEach(n => n.classList.toggle('is-active', n.dataset.view === s.view));
   // Friends nav badge: count of incoming requests.
   const fb = $('#nav-friends-badge');
   if (fb) { const n = friends.incomingCount(); fb.textContent = n || ''; fb.hidden = !n; }
   // Filters only make sense in the library — face-off has its own battle scopes now.
   $('#filterbar').style.display = s.view === 'library' ? '' : 'none';
+  if (s.view !== 'library') $('#filterbar').classList.remove('bar-hidden', 'bar-stuck');
   $('#app').classList.toggle('sb-collapsed', !!s.sidebarCollapsed);
 
   const btn = $('#btn-connect');
@@ -75,12 +89,10 @@ function syncControls() {
   btn.classList.toggle('connected', auth.isConnected());
   btn.querySelector('span').textContent = auth.isConnected() ? (p?.display_name || 'Connected') : 'Connect';
 
-  // active tag filter chips
-  $('#active-tag-filters').innerHTML = s.filterTags.map(tid => {
-    const t = state.tags.find(x => x.id === tid);
-    return t ? `<button class="chip removable" data-untag="${t.id}" aria-label="Remove filter ${esc(t.name)}">
-      <span class="dot" style="background:${esc(t.color)}"></span>${esc(t.name)} ✕</button>` : '';
-  }).join('');
+  // active filter chips (status, rating range, tags) — derived from current settings
+  $('#active-filters').innerHTML = activeFacets().map(f =>
+    `<button class="chip removable" data-facet="${esc(f.key)}" aria-label="Remove filter ${esc(f.label)}">
+      ${f.color ? `<span class="dot" style="background:${esc(f.color)}"></span>` : ''}${esc(f.label)} ✕</button>`).join('');
 }
 
 const SIDE_CAP = 4;                                   // sidebar lists show this many before "Show more"
@@ -252,11 +264,152 @@ function connectFlow() {
   auth.connect().catch(e => toast(e.message, 'err'));
 }
 
+// ---------- sort menu + filter popover ----------
+function filterCount() {
+  const s = state.settings;
+  return (s.ratedFilter !== 'all' ? 1 : 0)
+    + ((s.minRating > 1 || s.maxRating < 1000) ? 1 : 0)
+    + (s.filterTags.length ? 1 : 0);
+}
+
+// Active filter facets as removable-chip descriptors. `clear` re-reads live state.
+function activeFacets() {
+  const s = state.settings;
+  const out = [];
+  if (s.ratedFilter !== 'all') out.push({ key: 'status', label: RATED_LABELS[s.ratedFilter] || s.ratedFilter, clear: () => setSetting('ratedFilter', 'all') });
+  if (s.minRating > 1 || s.maxRating < 1000) out.push({ key: 'range', label: `★ ${s.minRating}–${s.maxRating}`, clear: () => setSettings({ minRating: 1, maxRating: 1000 }) });
+  for (const tid of s.filterTags) {
+    const t = state.tags.find(x => x.id === tid);
+    if (t) out.push({ key: 'tag:' + tid, label: t.name, color: t.color, clear: () => setSetting('filterTags', state.settings.filterTags.filter(x => x !== tid)) });
+  }
+  return out;
+}
+
+function openSortMenu() {
+  const s = state.settings;
+  const r = $('#btn-sort').getBoundingClientRect();
+  const items = SORT_FIELDS.map(([v, label]) => ({ label, checked: s.sortBy === v, action: () => setSetting('sortBy', v) }));
+  items.push('sep', {
+    label: s.sortDir === 'asc' ? 'Ascending' : 'Descending', icon: 'sort',
+    action: () => setSetting('sortDir', s.sortDir === 'asc' ? 'desc' : 'asc'),
+  });
+  ctxMenu(r.left, r.bottom + 6, items);
+}
+
+let filterPop = null;
+function filterPopKey(e) { if (e.key === 'Escape') { e.stopPropagation(); $('#btn-filter').focus(); closeFilterPop(); } }
+function outsideFilter(e) { if (filterPop && !filterPop.contains(e.target) && !e.target.closest('#btn-filter')) closeFilterPop(); }
+
+function closeFilterPop() {
+  if (!filterPop) return;
+  filterPop.remove(); filterPop = null;
+  document.removeEventListener('mousedown', outsideFilter);
+  document.removeEventListener('keydown', filterPopKey, true);
+  const b = $('#btn-filter');
+  b.setAttribute('aria-expanded', 'false'); b.classList.remove('is-open');
+}
+
+function updateRangeFill() {
+  const fill = filterPop?.querySelector('.rd-fill');
+  if (!fill) return;
+  const s = state.settings;
+  const lo = (s.minRating - 1) / 999 * 100, hi = (s.maxRating - 1) / 999 * 100;
+  fill.style.left = lo + '%';
+  fill.style.width = Math.max(0, hi - lo) + '%';
+}
+
+// (Re)render the popover body from current settings. Safe to call after a status/
+// tag/clear change; NOT called mid-slider-drag (that updates in place instead).
+function buildFilterPop() {
+  if (!filterPop) return;
+  const s = state.settings;
+  const statusPills = Object.entries(RATED_LABELS).map(([v, label]) =>
+    `<button class="fp-pill ${s.ratedFilter === v ? 'is-active' : ''}" data-status="${v}">${esc(label)}</button>`).join('');
+  const rangeOff = s.ratedFilter === 'unrated';
+  // Tags: show the 5 most-recently-used (plus any active ones), with "See all"
+  // opening the full picker. Keeps the popover short when the library has many tags.
+  const tagPill = t => `<button class="fp-pill ${s.filterTags.includes(t.id) ? 'is-active' : ''}" data-ftag="${esc(t.id)}"><span class="dot" style="background:${esc(t.color)}"></span>${esc(t.name)}</button>`;
+  const recentIds = [...s.recentTags];
+  for (const t of state.tags) if (!recentIds.includes(t.id)) recentIds.push(t.id);
+  const ordered = [...s.filterTags, ...recentIds.filter(id => !s.filterTags.includes(id))];
+  const shownTags = ordered.map(id => state.tags.find(t => t.id === id)).filter(Boolean).slice(0, Math.max(5, s.filterTags.length));
+  const tagPills = state.tags.length
+    ? shownTags.map(tagPill).join('') + (state.tags.length > shownTags.length ? `<button class="fp-pill fp-more" data-fp-moretags>See all (${state.tags.length})</button>` : '')
+    : '<span class="fp-empty">No tags yet</span>';
+  filterPop.innerHTML = `
+    <div class="fp-head"><h3>Filter</h3>${filterCount() ? '<button class="fp-clear" data-fp-clear>Clear all</button>' : ''}</div>
+    <div class="fp-sec"><span class="fp-label">Status</span><div class="fp-pills">${statusPills}</div></div>
+    <div class="fp-sec"><span class="fp-label">Rating</span>
+      <div class="range-dual ${rangeOff ? 'is-disabled' : ''}">
+        <div class="rd-track"></div><div class="rd-fill"></div>
+        <input type="range" id="fp-min" min="1" max="1000" value="${s.minRating}" aria-label="Minimum rating" ${rangeOff ? 'disabled' : ''}>
+        <input type="range" id="fp-max" min="1" max="1000" value="${s.maxRating}" aria-label="Maximum rating" ${rangeOff ? 'disabled' : ''}>
+      </div>
+      <div class="rd-readout"><span id="fp-min-out">${s.minRating}</span><span id="fp-max-out">${s.maxRating}</span></div>
+    </div>
+    <div class="fp-sec"><span class="fp-label">Tags</span><div class="fp-pills">${tagPills}</div></div>
+    <div class="fp-foot"><button class="btn btn-primary sm" data-fp-done>Done</button></div>`;
+  updateRangeFill();
+}
+
+function openFilterPop() {
+  if (filterPop) { closeFilterPop(); return; }
+  const btn = $('#btn-filter');
+  filterPop = document.createElement('div');
+  filterPop.className = 'filter-pop';
+  filterPop.setAttribute('role', 'dialog');
+  filterPop.setAttribute('aria-label', 'Filters');
+  filterPop.addEventListener('click', e => {
+    const st = e.target.closest('[data-status]');
+    if (st) { setSetting('ratedFilter', st.dataset.status); buildFilterPop(); return; }
+    const tg = e.target.closest('[data-ftag]');
+    if (tg) { const id = tg.dataset.ftag, cur = state.settings.filterTags; setSetting('filterTags', cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id]); buildFilterPop(); return; }
+    if (e.target.closest('[data-fp-moretags]')) { closeFilterPop(); openTagFilterModal(); return; }
+    if (e.target.closest('[data-fp-clear]')) { setSettings({ ...FILTER_CLEAR }); buildFilterPop(); return; }
+    if (e.target.closest('[data-fp-done]')) { closeFilterPop(); btn.focus(); }
+  });
+  filterPop.addEventListener('input', e => {
+    if (e.target.id !== 'fp-min' && e.target.id !== 'fp-max') return;
+    const minEl = filterPop.querySelector('#fp-min'), maxEl = filterPop.querySelector('#fp-max');
+    let lo = +minEl.value, hi = +maxEl.value;
+    if (lo > hi) { if (e.target.id === 'fp-min') { lo = hi; minEl.value = lo; } else { hi = lo; maxEl.value = hi; } }
+    filterPop.querySelector('#fp-min-out').textContent = lo;
+    filterPop.querySelector('#fp-max-out').textContent = hi;
+    setSettings({ minRating: lo, maxRating: hi });
+    updateRangeFill();
+  });
+  document.body.appendChild(filterPop);
+  buildFilterPop();
+  const r = btn.getBoundingClientRect();
+  let left = r.right - filterPop.offsetWidth;
+  if (left < 8) left = 8;
+  filterPop.style.left = left + 'px';
+  filterPop.style.top = (r.bottom + 6) + 'px';
+  btn.setAttribute('aria-expanded', 'true'); btn.classList.add('is-open');
+  setTimeout(() => document.addEventListener('mousedown', outsideFilter), 0);
+  document.addEventListener('keydown', filterPopKey, true);
+}
+
+// Full tag picker (the popover's "See all"): every tag as a multi-select chip.
+function openTagFilterModal() {
+  const pills = () => state.tags.length
+    ? state.tags.map(t => `<button class="fp-pill ${state.settings.filterTags.includes(t.id) ? 'is-active' : ''}" data-ftag="${esc(t.id)}"><span class="dot" style="background:${esc(t.color)}"></span>${esc(t.name)}</button>`).join('')
+    : '<span class="fp-empty">No tags yet</span>';
+  const m = openModal(`<div class="fp-pills tag-modal-pills">${pills()}</div>`, { title: 'Filter by tag' });
+  m.root.querySelector('.tag-modal-pills').addEventListener('click', e => {
+    const tg = e.target.closest('[data-ftag]');
+    if (!tg) return;
+    const id = tg.dataset.ftag, cur = state.settings.filterTags;
+    setSetting('filterTags', cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id]);
+    m.root.querySelector('.tag-modal-pills').innerHTML = pills();
+  });
+}
+
 // ---------- chrome bindings ----------
 function bindChrome() {
   $('#search').addEventListener('input', debounce(e => setSetting('search', e.target.value), 200));
-  $('#sort-by').addEventListener('change', e => setSetting('sortBy', e.target.value));
-  $('#sort-dir').addEventListener('click', () => setSetting('sortDir', state.settings.sortDir === 'asc' ? 'desc' : 'asc'));
+  $('#btn-sort').addEventListener('click', openSortMenu);
+  $('#btn-filter').addEventListener('click', openFilterPop);
   $('#layout-toggle').addEventListener('click', () => {
     const order = ['rows', 'cards', 'tiers'];
     setSetting('layout', order[(order.indexOf(state.settings.layout) + 1) % order.length]);
@@ -278,15 +431,9 @@ function bindChrome() {
   $('#filterbar').addEventListener('click', e => {
     const gm = e.target.closest('[data-gm]');
     if (gm) setSetting('groupMode', gm.dataset.gm);
-    const untag = e.target.closest('[data-untag]');
-    if (untag) setSetting('filterTags', state.settings.filterTags.filter(t => t !== untag.dataset.untag));
-    if (e.target.closest('#btn-clear-filters')) {
-      setSettings({ ...CLEARED_FILTERS });
-    }
+    const facet = e.target.closest('[data-facet]');
+    if (facet) activeFacets().find(f => f.key === facet.dataset.facet)?.clear();
   });
-  $('#rated-filter').addEventListener('change', e => setSetting('ratedFilter', e.target.value));
-  $('#min-rating').addEventListener('change', e => setSetting('minRating', clamp(+e.target.value || 1, 1, 1000)));
-  $('#max-rating').addEventListener('change', e => setSetting('maxRating', clamp(+e.target.value || 1000, 1, 1000)));
 
   $('.sidebar nav').addEventListener('click', e => {
     const n = e.target.closest('[data-view]');
@@ -378,6 +525,26 @@ function bindChrome() {
   });
 }
 
+// Auto-hide the filter sub-bar on downward scroll; reveal on scroll up or at the top.
+function bindBarAutoHide() {
+  const main = $('#main'), bar = $('#filterbar');
+  if (!main || !bar) return;
+  let last = 0, ticking = false;
+  main.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const y = main.scrollTop;
+      bar.classList.toggle('bar-stuck', y > 8);
+      if (y <= 8) bar.classList.remove('bar-hidden');                  // at top: always visible
+      else if (y > last + 4 && y > 60) bar.classList.add('bar-hidden'); // scrolling down
+      else if (y < last - 4) bar.classList.remove('bar-hidden');        // scrolling up
+      last = y;
+      ticking = false;
+    });
+  }, { passive: true });
+}
+
 function bindBus() {
   on('songs groups tags settings auth player playlists friends', renderSoon);
   on('toast', d => toast(d.msg, d.type));
@@ -456,6 +623,7 @@ $('#pb-more')?.addEventListener('click', e => {
 bindChrome();
 bindBus();
 bindDnd();
+bindBarAutoHide();
 cloud.initAutoSync();   // debounced auto-push after library changes (no-op until enabled)
 renderAll();
 

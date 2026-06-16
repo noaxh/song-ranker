@@ -126,7 +126,17 @@ svg { width: 18px; height: 18px; flex: none; }
      page background. Still sticky so they stay reachable while scrolling. */
   position: sticky; top: -14px; z-index: 20; padding-top: 6px;
   background: none;
+  transition: transform .25s ease, opacity .2s ease;
 }
+/* Auto-hide: slide the sub-bar up while scrolling down, reveal on scroll up / at top. */
+.filterbar.bar-hidden { transform: translateY(-130%); opacity: 0; pointer-events: none; }
+/* Frosted backing only once scrolled, so the revealed bar reads over song rows. */
+#filterbar.bar-stuck {
+  background: color-mix(in srgb, var(--bg2) 80%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow: 0 8px 22px rgb(0 0 0 / .28); border-radius: 12px;
+}
+[data-motion="off"] .filterbar { transition: none; }
 .pill-row { display: flex; gap: 6px; margin-left: 20px; }
 .pill {
   padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border);
