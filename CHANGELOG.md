@@ -14,6 +14,8 @@ All notable changes to Song Ranker are documented here. Format follows
   (respecting reduced-motion). The theme picker now groups presets into labelled sections.
 
 ### Changed
+- **The player bar now hides when nothing is loaded.** It only appears once a track
+  is playing (or paused), instead of sitting empty after connecting to Spotify.
 - **Accessibility & performance polish** (Web Interface Guidelines pass). Native
   scrollbars and form controls now match the active theme (`color-scheme`), the
   mobile browser chrome matches the page (`theme-color`), album-art loads sooner

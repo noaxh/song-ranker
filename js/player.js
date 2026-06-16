@@ -51,10 +51,10 @@ export async function init() {
   player.addListener('ready', ({ device_id }) => {
     deviceId = device_id;
     deviceActivated = false;   // fresh device id — must (re)activate before play
-    $('#playerbar').hidden = false;
+    // Bar stays hidden until a track is actually loaded (see renderBar).
     emit('player');
   });
-  player.addListener('not_ready', () => { deviceId = null; deviceActivated = false; emit('player'); });
+  player.addListener('not_ready', () => { deviceId = null; deviceActivated = false; $('#playerbar').hidden = true; emit('player'); });
   player.addListener('initialization_error', e => console.error('SDK init', e));
   player.addListener('authentication_error', e => console.error('SDK auth', e));
   player.addListener('account_error', e => {
@@ -240,6 +240,8 @@ export async function jumpTo(orderIndex) {
 
 // ---------- player bar DOM ----------
 function renderBar() {
+  // Hide the whole bar when nothing is loaded; show it once a track is current.
+  $('#playerbar').hidden = !current.uri;
   const art = $('#pb-art');
   if (current.art) { art.src = current.art; art.hidden = false; } else art.hidden = true;
   $('#pb-name').textContent = current.name || '';
