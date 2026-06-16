@@ -9,8 +9,9 @@ All notable changes to Song Ranker are documented here. Format follows
 ### Added
 - **Sumi-e theme set.** Three new ink-wash colourways in a dedicated section of the
   theme picker — **Sora** (sky blue), **Murasaki** (wisteria purple), and **Kurenai**
-  (deep crimson) — sharing one washi-paper, Japanese-brush aesthetic. The theme picker
-  now groups presets into labelled sections.
+  (deep crimson) — sharing one washi-paper, Japanese-brush aesthetic. Each carries a
+  flowing ink-cloud backdrop that tints to the theme's colour and drifts slowly
+  (respecting reduced-motion). The theme picker now groups presets into labelled sections.
 
 ### Changed
 - **Accessibility & performance polish** (Web Interface Guidelines pass). Native

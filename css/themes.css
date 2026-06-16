@@ -103,6 +103,25 @@
   --shadow: 0 10px 30px rgba(120, 50, 45, .15);
 }
 
+/* Flowing ink-cloud backdrop for the Sumi-e set. Swap out the blob/star layers
+   and paint a theme-tinted cloud field (SVG used as an alpha mask over --accent). */
+[data-theme="sora"] .bg-blobs, [data-theme="murasaki"] .bg-blobs, [data-theme="kurenai"] .bg-blobs,
+[data-theme="sora"] .bg-stars, [data-theme="murasaki"] .bg-stars, [data-theme="kurenai"] .bg-stars { display: none; }
+
+[data-theme="sora"] body::before,
+[data-theme="murasaki"] body::before,
+[data-theme="kurenai"] body::before {
+  content: ""; position: fixed; inset: -6%; z-index: -1; pointer-events: none;
+  background: var(--accent);
+  -webkit-mask: url("../assets/sumi-clouds.svg") center / cover no-repeat;
+          mask: url("../assets/sumi-clouds.svg") center / cover no-repeat;
+  -webkit-mask-mode: alpha; mask-mode: alpha;
+  opacity: .13;
+  animation: sumiDrift 60s ease-in-out infinite alternate;
+}
+@keyframes sumiDrift { to { transform: translate3d(2%, -2.5%, 0) scale(1.06) rotate(1deg); } }
+[data-motion="off"] body::before { animation: none; }
+
 /* ============ Density ============ */
 [data-density="compact"]     { --row-h: 38px; --pad: 6px; }
 [data-density="cozy"]        { --row-h: 52px; --pad: 10px; }
