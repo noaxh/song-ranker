@@ -8,7 +8,7 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-button { font: inherit; color: inherit; }
+button { font: inherit; color: inherit; touch-action: manipulation; }
 img { display: block; }
 [hidden] { display: none !important; }
 svg { width: 18px; height: 18px; flex: none; }

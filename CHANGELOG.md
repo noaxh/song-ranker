@@ -4,6 +4,17 @@ All notable changes to Song Ranker are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/).
 
+## [1.3.2] - 2026-06-16
+
+### Changed
+- **Accessibility & performance polish** (Web Interface Guidelines pass). Native
+  scrollbars and form controls now match the active theme (`color-scheme`), the
+  mobile browser chrome matches the page (`theme-color`), album-art loads sooner
+  (preconnect to Spotify's image CDN), long libraries skip offscreen row rendering
+  (`content-visibility`), modal scrolling no longer chains to the page, taps lose
+  the 300 ms delay (`touch-action`), and the library search field no longer
+  autocompletes or spellchecks.
+
 ## [1.3.1] - 2026-06-16
 
 ### Added
@@ -69,6 +80,7 @@ All notable changes to Song Ranker are documented here. Format follows
   Leaderboard and stats dashboard. In-app Web Playback (Premium). Nine theme
   presets plus a custom theme editor. Local-first storage with JSON export/import.
 
+[1.3.2]: https://github.com/noaxh/song-ranker/releases/tag/v1.3.2
 [1.3.1]: https://github.com/noaxh/song-ranker/releases/tag/v1.3.1
 [1.3.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.3.0
 [1.2.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.2.0

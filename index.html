@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d0f1d">
 <title>Song Ranker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.scdn.co">
+<link rel="dns-prefetch" href="https://i.scdn.co">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/themes.css?v=3">
-<link rel="stylesheet" href="css/main.css?v=4">
-<link rel="stylesheet" href="css/components.css?v=8">
+<link rel="stylesheet" href="css/themes.css?v=4">
+<link rel="stylesheet" href="css/main.css?v=5">
+<link rel="stylesheet" href="css/components.css?v=9">
 <link rel="stylesheet" href="css/glass.css?v=4">
 <link rel="stylesheet" href="css/skin.css?v=3">
 <link rel="stylesheet" href="css/meridian.css?v=1">
@@ -89,7 +92,7 @@ window.addEventListener('error', function (e) {
     <div class="brand"><svg class="brand-ic"><use href="#i-music"/></svg><h1>Song&nbsp;Ranker</h1></div>
     <div class="search-wrap">
       <svg><use href="#i-search"/></svg>
-      <input type="search" id="search" placeholder="Search songs, artists, albums…  ( / )" aria-label="Search library">
+      <input type="search" id="search" placeholder="Search songs, artists, albums…  ( / )" aria-label="Search library" autocomplete="off" spellcheck="false">
     </div>
     <div class="top-actions">
       <button class="btn-icon" id="btn-undo" aria-label="Undo (U)" title="Undo (U)"><svg><use href="#i-undo"/></svg></button>
@@ -126,7 +129,7 @@ window.addEventListener('error', function (e) {
       <button class="btn btn-ghost sm" id="btn-shortcuts"><svg><use href="#i-keyboard"/></svg>Shortcuts</button>
       <button class="btn btn-ghost sm" id="btn-theme"><svg><use href="#i-palette"/></svg>Themes</button>
     </div>
-    <a class="hint" id="app-version" href="https://github.com/noaxh/song-ranker/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="What's new: changelog" style="display:block;text-align:center;padding:6px 8px;text-decoration:none">v1.3.1</a>
+    <a class="hint" id="app-version" href="https://github.com/noaxh/song-ranker/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="What's new: changelog" style="display:block;text-align:center;padding:6px 8px;text-decoration:none">v1.3.2</a>
   </aside>
 
   <main class="main" id="main" tabindex="-1">

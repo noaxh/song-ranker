@@ -24,6 +24,7 @@
   --row-h: 52px;
   --pad: 10px;
   --dur: 180ms;
+  color-scheme: dark;   /* native scrollbars/controls match the dark UI */
 }
 
 /* Meridian: Apple graphite neutrals x Spotify green, iOS cyan secondary */
@@ -40,6 +41,7 @@
   --accent: #1db954; --accent-text: #04210f; --accent2: #1ed760;
   --shadow: 0 8px 30px rgba(0, 0, 0, .8);
 }
+[data-theme="light"], [data-theme="cream"] { color-scheme: light; }
 [data-theme="light"] {
   --bg: #f4f6fb; --bg2: #ffffff; --bg3: #e9edf5; --border: #d4dae6;
   --text: #0f172a; --text2: #56627a;
