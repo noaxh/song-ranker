@@ -4,6 +4,17 @@ All notable changes to Song Ranker are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/).
 
+## [1.3.1] - 2026-06-16
+
+### Added
+- **Search all of Spotify.** A new **Spotify** button in the top bar opens a catalog
+  search: find any track on Spotify, not just the ones in your library. Each result
+  can be played, added to the queue, or added to your library — and **Play never
+  imports**, so listening no longer pollutes your library.
+- **Add to queue / Play next.** The right-click song menu (and the catalog results)
+  can now append a track to the live queue or slot it right after the current track,
+  without restarting playback.
+
 ## [1.3.0] - 2026-06-16
 
 ### Added
@@ -58,6 +69,7 @@ All notable changes to Song Ranker are documented here. Format follows
   Leaderboard and stats dashboard. In-app Web Playback (Premium). Nine theme
   presets plus a custom theme editor. Local-first storage with JSON export/import.
 
+[1.3.1]: https://github.com/noaxh/song-ranker/releases/tag/v1.3.1
 [1.3.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.3.0
 [1.2.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.2.0
 [1.1.0]: https://github.com/noaxh/song-ranker/releases/tag/v1.1.0

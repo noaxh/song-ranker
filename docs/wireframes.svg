@@ -1,0 +1,96 @@
+<svg viewBox="0 0 820 1360" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .panel { fill: #f1efe7; }
+    .card { fill: #ffffff; stroke: #d8d4c8; stroke-width: 1; }
+    .title { fill: #1a1a1a; font-size: 19px; font-weight: 600; }
+    .label { fill: #777; font-size: 13px; }
+    .hint { fill: #999; font-size: 13px; }
+    .ph { fill: #cfcabb; }
+    .phlite { fill: #e2ddcf; }
+    .art { fill: #e8e3d4; }
+    .pill { fill: none; stroke: #c9c4b6; stroke-width: 1.2; }
+    .ic { fill: none; stroke: #7a7568; stroke-width: 1.3; }
+    .accent { stroke: #2f6fd6; }
+    .accenttext { fill: #2f6fd6; font-size: 15px; }
+  </style>
+
+  <!-- Panel 1: Global catalog search -->
+  <rect class="panel" x="0" y="0" width="395" height="560" rx="14"/>
+  <text class="title" x="28" y="92">1 · Global catalog search</text>
+  <rect class="card" x="28" y="118" width="339" height="400" rx="10"/>
+  <rect class="pill" x="50" y="140" width="295" height="64" rx="32"/>
+  <rect class="ic" x="68" y="164" width="16" height="16" rx="3"/>
+  <text class="label" x="96" y="168">search all of</text>
+  <text class="label" x="96" y="190">Spotify…</text>
+  <text class="label" x="50" y="258">SONGS</text>
+  <rect class="art" x="50" y="286" width="50" height="50" rx="6"/>
+  <rect class="ph" x="116" y="305" width="130" height="12" rx="6"/>
+  <rect class="ic" x="262" y="298" width="22" height="22" rx="3"/>
+  <rect class="ic" x="306" y="298" width="22" height="22" rx="3"/>
+  <rect class="art" x="50" y="356" width="50" height="50" rx="6"/>
+  <rect class="ph" x="116" y="375" width="130" height="12" rx="6"/>
+  <rect class="ic" x="262" y="368" width="22" height="22" rx="3"/>
+  <rect class="ic" x="306" y="368" width="22" height="22" rx="3"/>
+  <text class="hint" x="50" y="446">play now · add to queue · +</text>
+  <text class="hint" x="50" y="468">library</text>
+
+  <!-- Panel 2: Full-screen now playing -->
+  <rect class="panel" x="425" y="0" width="395" height="560" rx="14"/>
+  <text class="title" x="453" y="92">2 · Full-screen now playing</text>
+  <rect class="card" x="453" y="118" width="339" height="400" rx="10"/>
+  <rect class="ic" x="690" y="138" width="16" height="16" rx="3"/>
+  <text class="hint" x="712" y="151">close</text>
+  <rect class="art" x="565" y="170" width="115" height="115" rx="10"/>
+  <rect class="ph" x="490" y="372" width="265" height="13" rx="6"/>
+  <rect class="phlite" x="535" y="404" width="175" height="11" rx="6"/>
+  <rect class="ic" x="538" y="438" width="22" height="22" rx="3"/>
+  <rect class="ic" x="601" y="438" width="22" height="22" rx="3"/>
+  <rect class="ic" x="664" y="438" width="22" height="22" rx="3"/>
+  <text class="hint" x="513" y="508">+ lyrics scroll below</text>
+
+  <!-- Panel 3: Queue panel -->
+  <rect class="panel" x="0" y="600" width="395" height="430" rx="14"/>
+  <text class="title" x="28" y="652">3 · Queue panel (manual)</text>
+  <rect class="card" x="28" y="678" width="339" height="320" rx="10"/>
+  <text class="label" x="50" y="712">NOW PLAYING</text>
+  <rect class="ic" x="50" y="740" width="22" height="22" rx="3"/>
+  <rect class="ph" x="86" y="746" width="260" height="12" rx="6"/>
+  <text class="label" x="50" y="810">NEXT UP — drag to reorder</text>
+  <rect class="ic" x="50" y="836" width="22" height="22" rx="3"/>
+  <rect class="ph" x="86" y="842" width="220" height="12" rx="6"/>
+  <rect class="ic" x="320" y="836" width="22" height="22" rx="3"/>
+  <rect class="ic" x="50" y="884" width="22" height="22" rx="3"/>
+  <rect class="ph" x="86" y="890" width="220" height="12" rx="6"/>
+  <rect class="ic" x="320" y="884" width="22" height="22" rx="3"/>
+  <rect class="ic" x="50" y="932" width="22" height="22" rx="3"/>
+  <rect class="ph" x="86" y="938" width="220" height="12" rx="6"/>
+  <rect class="ic" x="320" y="932" width="22" height="22" rx="3"/>
+
+  <!-- Panel 4: Device picker -->
+  <rect class="panel" x="425" y="600" width="395" height="430" rx="14"/>
+  <text class="title" x="453" y="652">4 · Device picker (Connect)</text>
+  <rect class="card" x="453" y="710" width="339" height="230" rx="10"/>
+  <text class="label" x="475" y="744">PLAY ON</text>
+  <rect class="ic accent" x="475" y="784" width="22" height="22" rx="3"/>
+  <text class="accenttext" x="513" y="800">This browser</text>
+  <rect class="ic accent" x="735" y="784" width="22" height="22" rx="3"/>
+  <rect class="ic" x="475" y="838" width="22" height="22" rx="3"/>
+  <rect class="ph" x="513" y="844" width="245" height="12" rx="6"/>
+  <rect class="ic" x="475" y="892" width="22" height="22" rx="3"/>
+  <rect class="ph" x="513" y="898" width="245" height="12" rx="6"/>
+
+  <!-- Panel 5: Listen vs Import -->
+  <rect class="panel" x="0" y="1070" width="820" height="290" rx="14"/>
+  <text class="title" x="28" y="1128">5 · Playlist click — Listen vs Import (fixes the library wall)</text>
+  <rect class="card" x="28" y="1150" width="764" height="80" rx="10"/>
+  <rect class="art" x="48" y="1162" width="56" height="56" rx="6"/>
+  <rect class="ph" x="128" y="1176" width="320" height="13" rx="6"/>
+  <rect class="phlite" x="128" y="1200" width="180" height="11" rx="6"/>
+  <rect class="pill accent" x="470" y="1166" width="138" height="48" rx="24"/>
+  <rect class="ic accent" x="496" y="1182" width="16" height="16" rx="3"/>
+  <text class="accenttext" x="524" y="1196">Listen</text>
+  <rect class="pill" x="628" y="1166" width="146" height="48" rx="24"/>
+  <rect class="ic" x="660" y="1182" width="16" height="16" rx="3"/>
+  <text class="label" x="688" y="1196" font-size="15">Import</text>
+  <text class="hint" x="28" y="1282">Listen = stream into queue, no library pollution. Import = current behavior.</text>
+</svg>

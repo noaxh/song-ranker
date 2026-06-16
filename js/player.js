@@ -188,6 +188,21 @@ export async function playList(items, idx = 0) {
   emit('player');
 }
 
+// Append ONE track to the live queue without restarting playback. `next` inserts
+// it right after the current track; otherwise it goes to the end. With nothing
+// queued yet, it just starts playback on that track.
+export async function enqueue(item, { next = false } = {}) {
+  if (!deviceId) throw new Error('Player not ready — Spotify Premium required for in-app playback');
+  const n = norm(item);
+  if (!n.uri) throw new Error('No playable track (missing Spotify audio)');
+  if (!queue.length) { await playList([item], 0); return; }
+  queue.push(n);
+  const qi = queue.length - 1;
+  if (next) order.splice(orderPos + 1, 0, qi);
+  else order.push(qi);
+  syncControls(); renderQueue(); emit('player');
+}
+
 export const toggle = () => player?.togglePlay();
 export const next = () => advance(false);
 export async function prev() {

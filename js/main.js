@@ -21,6 +21,7 @@ import * as cloud from './cloud.js';
 import * as friends from './friends.js';
 import * as friendsView from './friends-view.js';
 import * as compare from './compare.js';
+import { openCatalogSearch } from './catalog.js';
 
 // Reset target for "Clear filters" — keep grouping in here so genre/group views
 // are exitable via Clear, not just via the All pill.
@@ -212,7 +213,11 @@ async function openPlaylist(plId) {
 function showSongMenu({ x, y, ids }) {
   const single = ids.length === 1 ? state.songs[ids[0]] : null;
   const items = [];
-  if (single?.uri) items.push({ label: 'Play', icon: 'play', action: () => views.playFrom(single.id) });
+  if (single?.uri) {
+    items.push({ label: 'Play', icon: 'play', action: () => views.playFrom(single.id) });
+    items.push({ label: 'Add to queue', icon: 'queue', action: () => enqueueSong(single, false) });
+    items.push({ label: 'Play next', icon: 'queue', action: () => enqueueSong(single, true) });
+  }
   if (single) items.push({ label: 'Song details', icon: 'info', action: () => modals.songDetail(single.id) });
   // Quick-tag submenu: most-recently-used tags first, padded with the rest so it
   // is useful before any usage history exists. Click toggles the tag on the
@@ -254,6 +259,13 @@ async function deleteSongs(ids) {
 function doUndo() {
   const label = undo();
   toast(label ? 'Undid: ' + label : 'Nothing to undo', label ? 'ok' : 'info');
+}
+
+async function enqueueSong(song, next) {
+  try {
+    await player.enqueue(song, { next });
+    toast(next ? 'Playing next' : 'Added to queue', 'ok');
+  } catch (e) { toast(e.message, 'err', 5000); }
 }
 
 function connectFlow() {
@@ -415,6 +427,7 @@ function bindChrome() {
     setSetting('layout', order[(order.indexOf(state.settings.layout) + 1) % order.length]);
   });
   $('#btn-undo').addEventListener('click', doUndo);
+  $('#btn-catalog').addEventListener('click', openCatalogSearch);
   $('#btn-import').addEventListener('click', () => importModal());
   $('#btn-connect').addEventListener('click', connectFlow);
   $('#btn-settings').addEventListener('click', () => modals.settings());
