@@ -251,6 +251,8 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 .swatch-btn.is-active { border-color: var(--text); }
 
 .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.theme-sec-label { font-size: .7rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text2); margin: 14px 2px 6px; }
+.theme-sec-label:first-child { margin-top: 0; }
 .theme-card {
   border: 2px solid var(--border); border-radius: var(--radius); padding: 10px; cursor: pointer;
   display: flex; flex-direction: column; gap: 8px; background: none; text-align: left;

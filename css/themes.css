@@ -82,6 +82,27 @@
   --danger: #ff5252; --shadow: none;
 }
 
+/* ===== Sumi-e set: Japanese ink-wash on washi paper, one design, three hues ===== */
+[data-theme="sora"], [data-theme="murasaki"], [data-theme="kurenai"] { color-scheme: light; }
+[data-theme="sora"] {        /* 空 — sky / cloud blue */
+  --bg: #eef3f8; --bg2: #fbfdff; --bg3: #e2eaf2; --border: #cad7e5;
+  --text: #1b2733; --text2: #5a6b7d;
+  --accent: #3b82c4; --accent-text: #ffffff; --accent2: #8fbfe0;
+  --shadow: 0 10px 30px rgba(40, 70, 110, .14);
+}
+[data-theme="murasaki"] {    /* 紫 — wisteria purple */
+  --bg: #f2eef8; --bg2: #fcf9ff; --bg3: #e7def2; --border: #d4c6e6;
+  --text: #241b30; --text2: #6b5d7d;
+  --accent: #7c4dc4; --accent-text: #ffffff; --accent2: #b793de;
+  --shadow: 0 10px 30px rgba(90, 60, 140, .15);
+}
+[data-theme="kurenai"] {     /* 紅 — deep crimson / beni */
+  --bg: #f7efea; --bg2: #fffaf6; --bg3: #efe0d9; --border: #e3c9bd;
+  --text: #2a1c19; --text2: #7a5f57;
+  --accent: #a32a2e; --accent-text: #fff7f5; --accent2: #cf7060;
+  --shadow: 0 10px 30px rgba(120, 50, 45, .15);
+}
+
 /* ============ Density ============ */
 [data-density="compact"]     { --row-h: 38px; --pad: 6px; }
 [data-density="cozy"]        { --row-h: 52px; --pad: 10px; }

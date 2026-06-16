@@ -16,6 +16,10 @@ export const PRESETS = {
   ocean:     { name: 'Ocean',     bg: '#081826', accent: '#38bdf8', accent2: '#34d399' },
   crimson:   { name: 'Crimson',   bg: '#160a0d', accent: '#f43f5e', accent2: '#fbbf24' },
   contrast:  { name: 'High Contrast', bg: '#000000', accent: '#ffd500', accent2: '#00e676' },
+  // Sumi-e set — Japanese ink-wash colourways (flowing-brush aesthetic, washi paper).
+  sora:      { name: 'Sora',      bg: '#eef3f8', accent: '#3b82c4', accent2: '#8fbfe0', section: 'Sumi-e' },
+  murasaki:  { name: 'Murasaki',  bg: '#f2eef8', accent: '#7c4dc4', accent2: '#b793de', section: 'Sumi-e' },
+  kurenai:   { name: 'Kurenai',   bg: '#f7efea', accent: '#a32a2e', accent2: '#cf7060', section: 'Sumi-e' },
 };
 
 // CSS variables editable in the custom theme editor
@@ -104,10 +108,14 @@ export function themePickerHtml() {
       </span>
       <span class="tc-name">${esc(name)}</span>
     </button>`;
-  let html = '<div class="theme-grid">';
-  for (const [id, p] of Object.entries(PRESETS)) html += card(id, p.name, p.bg, p.accent, p.accent2);
-  for (const t of s.customThemes) html += card(t.id, t.name, t.vars['--bg'] || '#222', t.vars['--accent'] || '#888', t.vars['--accent2'] || '#888');
-  html += '</div>';
+  // Group presets by section so colourway sets (e.g. Sumi-e) get their own header.
+  const groups = {};
+  for (const [id, p] of Object.entries(PRESETS)) (groups[p.section || 'Themes'] ||= []).push(card(id, p.name, p.bg, p.accent, p.accent2));
+  if (s.customThemes.length)
+    groups['Your themes'] = s.customThemes.map(t => card(t.id, t.name, t.vars['--bg'] || '#222', t.vars['--accent'] || '#888', t.vars['--accent2'] || '#888'));
+  let html = '';
+  for (const [label, cards] of Object.entries(groups))
+    html += `<div class="theme-sec-label">${esc(label)}</div><div class="theme-grid">${cards.join('')}</div>`;
   return html;
 }
 
