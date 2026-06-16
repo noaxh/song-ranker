@@ -113,8 +113,8 @@
 [data-theme="kurenai"] body::before {
   content: ""; position: fixed; inset: -6%; z-index: -1; pointer-events: none;
   background: var(--accent);
-  -webkit-mask: url("../assets/sumi-clouds.svg") center / cover no-repeat;
-          mask: url("../assets/sumi-clouds.svg") center / cover no-repeat;
+  -webkit-mask: url("../assets/sumi-clouds.svg?v=2") center / cover no-repeat;
+          mask: url("../assets/sumi-clouds.svg?v=2") center / cover no-repeat;
   -webkit-mask-mode: alpha; mask-mode: alpha;
   opacity: .13;
   animation: sumiDrift 60s ease-in-out infinite alternate;
