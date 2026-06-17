@@ -94,3 +94,22 @@
   .h-row { grid-auto-columns: 132px; }
   .h-avatar { width: 76px; height: 76px; }
 }
+
+/* Quick-play feed pair (Liked Songs / Recently played) — connected only */
+.h-feeds { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.h-feed {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px; border-radius: calc(var(--radius) + 2px);
+  background: color-mix(in srgb, var(--bg2) 80%, transparent);
+  border: 1px solid var(--border); cursor: pointer; text-align: left;
+  color: var(--text); transition: background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.h-feed:hover { background: var(--bg3); transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+.h-feed-art { width: 52px; height: 52px; flex: none; display: grid; place-items: center; border-radius: 10px; }
+.h-feed-art svg { width: 24px; height: 24px; color: #fff; }
+.h-feed-liked .h-feed-art { background: linear-gradient(135deg, #6a5cff, #a8e6cf); }
+.h-feed-recent .h-feed-art { background: linear-gradient(135deg, #2d7dd2, #97d8c4); }
+.h-feed-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.h-feed-tx b { font-size: .95rem; font-weight: 600; }
+.h-feed-tx i { font-size: .76rem; color: var(--text2); font-style: normal; }
+@media (max-width: 560px) { .h-feeds { grid-template-columns: 1fr; } }

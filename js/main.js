@@ -11,6 +11,7 @@ import * as api from './api.js';
 import * as views from './views.js';
 import * as stats from './stats.js';
 import * as home from './home.js';
+import * as playlist from './playlist.js';
 import * as player from './player.js';
 import * as dnd from './dnd.js';
 import * as lib from './library.js';
@@ -49,6 +50,7 @@ function renderAll() {
   else if (state.settings.view === 'friends') friendsView.render();
   else if (state.settings.view === 'compare') compare.render();
   else if (state.settings.view === 'home') home.render();
+  else if (state.settings.view === 'playlist') playlist.render();
   else views.render();
   renderSidebar();
   syncControls();
@@ -190,23 +192,26 @@ async function syncPlays() {
   }
 }
 
-// Click on a playlist: open its mirrored group if imported, otherwise offer import.
-async function openPlaylist(plId) {
+// Click on a playlist: open the Playlist Overview (stream-first, no force-import).
+// An already-imported playlist resolves from its mirror group (records, zero
+// network); an un-imported one fetches from Spotify. Import lives inside the view.
+function openPlaylist(plId) {
   const p = state.spotifyPlaylists.find(x => x.id === plId);
   if (!p) return;
+  const back = state.settings.view;
   const g = state.groups.find(x => x.name === p.name && x.songIds.length);
-  if (g) {
-    setSettings({ view: 'library', groupMode: 'group' });
-    requestAnimationFrame(() => $(`[data-bucket="${CSS.escape(g.id)}"]`)?.scrollIntoView({ block: 'start' }));
-    return;
-  }
-  if (await confirm(`Import "${p.name}" (${p.total ?? '?'} tracks)? Tracks are added to your library and mirrored as a group so you can browse and battle it.`, { okLabel: 'Import' })) {
-    try {
-      const r = await lib.importPlaylist(plId, { asGroupNamed: p.name });
-      toast(`${p.name}: ${r.added} added, ${r.skipped} already in library`, 'ok');
-      setSettings({ view: 'library', groupMode: 'group' });
-    } catch (e) { toast(e.message, 'err', 6000); }
-  }
+  const target = g
+    ? { type: 'group', id: g.id, name: p.name, back }
+    : { type: 'spotify', id: plId, name: p.name, img: p.img || '', back };
+  setSettings({ view: 'playlist', openTarget: target });
+}
+
+// Open a virtual feed (Liked Songs / Recently played) in the same Overview view.
+function openFeed(type) {
+  setSettings({
+    view: 'playlist',
+    openTarget: { type, name: type === 'liked' ? 'Liked Songs' : 'Recently played', back: state.settings.view },
+  });
 }
 
 // ---------- context menu for songs ----------
@@ -567,6 +572,7 @@ function bindBus() {
   on('delete-songs', deleteSongs);
   on('do-undo', doUndo);
   on('open-playlist', openPlaylist);
+  on('open-feed', openFeed);
   on('player-error', msg => toast(msg, 'err', 5000));
   on('empty-action', act => {
     if (act === 'connect') connectFlow();
@@ -624,6 +630,7 @@ leaderboard.init();
 friendsView.init();
 compare.init();
 home.init();
+playlist.init();
 player.bindBarControls();
 // Player-bar "more" button → the same right-click song menu, on the current track.
 $('#pb-more')?.addEventListener('click', e => {

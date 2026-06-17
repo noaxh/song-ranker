@@ -114,6 +114,14 @@ export function render() {
       ${unrated ? `<button class="h-action" data-h-act="backlog"><svg><use href="#i-edit"/></svg><span><b>Rate backlog</b><i>${unrated} unrated</i></span></button>` : ''}
       <button class="h-action" data-h-act="shuffle"><svg><use href="#i-music"/></svg><span><b>Surprise me</b><i>Random pick</i></span></button>
     </div>
+    ${auth.isConnected() ? `<div class="h-feeds">
+      <button class="h-feed h-feed-liked" data-h-feed="liked" aria-label="Open Liked Songs">
+        <span class="h-feed-art"><svg><use href="#i-heart"/></svg></span>
+        <span class="h-feed-tx"><b>Liked Songs</b><i>Your saved tracks</i></span></button>
+      <button class="h-feed h-feed-recent" data-h-feed="recent" aria-label="Open Recently played">
+        <span class="h-feed-art"><svg><use href="#i-refresh"/></svg></span>
+        <span class="h-feed-tx"><b>Recently played</b><i>Across your devices</i></span></button>
+    </div>` : ''}
     ${topGenres.length ? `<div class="h-genres">${topGenres.map(([g, n]) => `<button class="chip h-genre" data-h-genre="${esc(g)}">${esc(g)} <span class="hint">${n}</span></button>`).join('')}</div>` : ''}
     ${shelf('Jump back in', recent.map(songTile).join(''), 'recently added')}
     ${rising.length >= 3 ? shelf('On the rise', rising.map(songTile).join(''), 'recently rated') : ''}
@@ -145,6 +153,8 @@ export function init() {
     if (genre) { setSettings({ view: 'library', groupMode: 'genre', search: '' }); requestAnimationFrame(() => $(`[data-bucket="genre:${CSS.escape(genre.dataset.hGenre)}"]`)?.scrollIntoView({ block: 'start' })); return; }
     const pl = e.target.closest('[data-h-pl]');
     if (pl) { emit('open-playlist', pl.dataset.hPl); return; }
+    const feed = e.target.closest('[data-h-feed]');
+    if (feed) { emit('open-feed', feed.dataset.hFeed); return; }
     const album = e.target.closest('[data-h-album]');
     if (album) {
       album.classList.add('is-busy');

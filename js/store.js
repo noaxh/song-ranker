@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS = {
   bgStyle: 'stars',          // 'stars' | 'blobs' | 'both' | 'off'
   sidebarCollapsed: false,
   view: 'home', layout: 'rows', groupMode: 'none',
+  openTarget: null,          // Playlist Overview target { type, id, name, img?, back }
   sortBy: 'added', sortDir: 'desc',
   search: '', filterTags: [], recentTags: [], ratedFilter: 'all', minRating: 1, maxRating: 1000,
   activeGroup: null, activeArtist: null, activeGenre: null,
