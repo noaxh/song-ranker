@@ -195,10 +195,18 @@ async function syncPlays() {
 // Click on a playlist: open the Playlist Overview (stream-first, no force-import).
 // An already-imported playlist resolves from its mirror group (records, zero
 // network); an un-imported one fetches from Spotify. Import lives inside the view.
+// Where Back returns to — never 'playlist' itself (that would be a dead button
+// when opening one playlist from another); chain to the prior back or Home.
+function prevView() {
+  return state.settings.view === 'playlist'
+    ? (state.settings.openTarget?.back || 'home')
+    : state.settings.view;
+}
+
 function openPlaylist(plId) {
   const p = state.spotifyPlaylists.find(x => x.id === plId);
   if (!p) return;
-  const back = state.settings.view;
+  const back = prevView();
   const g = state.groups.find(x => x.name === p.name && x.songIds.length);
   const target = g
     ? { type: 'group', id: g.id, name: p.name, back }
@@ -210,7 +218,7 @@ function openPlaylist(plId) {
 function openFeed(type) {
   setSettings({
     view: 'playlist',
-    openTarget: { type, name: type === 'liked' ? 'Liked Songs' : 'Recently played', back: state.settings.view },
+    openTarget: { type, name: type === 'liked' ? 'Liked Songs' : 'Recently played', back: prevView() },
   });
 }
 

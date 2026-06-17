@@ -8,6 +8,8 @@
   --pl-radius: 16px;
   --pl-hair: color-mix(in srgb, var(--text) 8%, transparent);
   --spring: cubic-bezier(.22, 1, .36, 1);
+  /* full-bleed: cancel #main's 14px/20px padding so the hero reaches the sidebar */
+  margin: -14px -20px 0;
   padding-bottom: 40px;
 }
 
