@@ -3,12 +3,12 @@ import { $, esc } from './utils.js';
 
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function openModal(bodyHtml, { title = '', wide = false, footHtml = '' } = {}) {
+export function openModal(bodyHtml, { title = '', wide = false, fullscreen = false, footHtml = '' } = {}) {
   const prevFocus = document.activeElement;
   const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop';
+  backdrop.className = 'modal-backdrop' + (fullscreen ? ' fullscreen' : '');
   backdrop.innerHTML = `
-    <div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+    <div class="modal ${fullscreen ? 'fullscreen' : wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
       <div class="modal-head"><h2>${esc(title)}</h2>
         <button class="btn-icon" data-close aria-label="Close dialog"><svg><use href="#i-x"/></svg></button>
       </div>

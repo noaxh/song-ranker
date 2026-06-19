@@ -238,6 +238,35 @@ textarea.input { width: 100%; resize: vertical; min-height: 70px; }
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes slideUp { from { transform: translateY(14px); opacity: 0; } }
 
+/* ---- Full-screen now-playing (item 5b). `.modal-backdrop .modal.fullscreen`
+   (0,3,0) outranks the skin overrides `[data-skin=…] .modal` (0,2,0). ---- */
+.modal-backdrop.fullscreen { padding: 0; overflow: hidden; }
+.modal-backdrop .modal.fullscreen {
+  max-width: none; width: 100%; height: 100%; border: 0; border-radius: 0;
+  box-shadow: none; display: flex; flex-direction: column; overflow: hidden;
+}
+.modal.fullscreen .modal-head { border-bottom: 0; padding: 14px 18px; flex: 0 0 auto; }
+.modal.fullscreen .modal-head h2 {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; color: var(--text2);
+}
+.modal.fullscreen .modal-body { flex: 1; overflow-y: auto; padding: 0 18px 40px; }
+.np { width: 100%; max-width: 540px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: min(5vh, 40px); }
+.np-art-wrap { width: min(72vw, 320px); aspect-ratio: 1; }
+.np-art { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; background: var(--bg3); box-shadow: 0 20px 50px rgb(0 0 0 / .4); }
+.np-info { text-align: center; max-width: 100%; }
+.np-name { font-size: 1.35rem; font-weight: 700; line-height: 1.25; }
+.np-artist { color: var(--text2); margin-top: 4px; }
+.np-seek { display: flex; align-items: center; gap: 10px; width: 100%; }
+.np-seek input[type="range"] { flex: 1; }
+.np-seek span { font-size: .72rem; color: var(--text2); font-variant-numeric: tabular-nums; }
+.np-controls { display: flex; align-items: center; gap: 16px; }
+.np-controls .btn-icon svg { width: 20px; height: 20px; }
+.np-controls .np-play { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; }
+.np-controls .np-play svg { width: 24px; height: 24px; }
+.np-queue { width: 100%; }
+#pb-art, .pb-meta { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .modal.fullscreen, .modal-backdrop.fullscreen { animation: none; } }
+
 .form-row { display: flex; flex-direction: column; gap: 5px; }
 .form-row label { font-size: .8rem; color: var(--text2); font-weight: 500; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

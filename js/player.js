@@ -6,6 +6,7 @@ import * as auth from './auth.js';
 import * as api from './api.js';
 import { $, esc, fmtMs, announce } from './utils.js';
 import { emit } from './store.js';
+import { removeFromQueue, reorderIndices } from './queue-order.js';
 
 let player = null;
 let deviceId = null;
@@ -26,6 +27,7 @@ let deviceActivated = false; // has our SDK device been made the active Connect 
 export const isReady = () => !!deviceId;
 export const nowPlayingUri = () => (current.paused ? null : current.uri);
 export const currentUri = () => current.uri;
+export const getCurrent = () => ({ ...current });   // snapshot for the now-playing overlay
 export const getShuffle = () => shuffle;
 export const getRepeat = () => repeat;
 
@@ -238,6 +240,80 @@ export async function jumpTo(orderIndex) {
   renderQueue(); emit('player');
 }
 
+// Remove the track at order-position `oi`. Splices BOTH `queue` and `order` (and
+// renumbers `order`) so a later buildOrder can't resurrect it; the current entry is
+// tracked by identity so `orderPos` survives the splice.
+export async function removeAt(oi) {
+  if (oi < 0 || oi >= order.length) return;
+  const removingCurrent = oi === orderPos;
+  const curItem = removingCurrent ? null : queue[order[orderPos]];
+  ({ queue, order } = removeFromQueue(queue, order, oi));   // drops from both + renumbers (no resurrection)
+  if (removingCurrent) {
+    if (oi < order.length) { orderPos = oi; await playCurrent(); }            // successor slid into oi
+    else if (repeat !== 'off' && order.length) { orderPos = 0; await playCurrent(); } // removed last under repeat → wrap
+    else { orderPos = Math.max(0, order.length - 1); player?.pause(); }       // removed last, no repeat → stop audio
+  } else {
+    orderPos = order.findIndex(x => queue[x] === curItem);
+  }
+  syncControls(); renderQueue(); emit('player');
+}
+
+// Reorder the queue: move the entry at `fromOi` to land before `toOi` (drop-before
+// semantics). Pure permutation of `order`, so the distinct-index invariant holds.
+export function moveInOrder(fromOi, toOi) {
+  if (fromOi === toOi || fromOi < 0 || fromOi >= order.length) return;
+  const curItem = queue[order[orderPos]];
+  order = reorderIndices(order, fromOi, toOi);
+  orderPos = order.findIndex(x => queue[x] === curItem);   // current follows by identity
+  syncControls(); renderQueue(); emit('player');
+}
+
+// Wire jump / remove / drag-reorder onto a queue-list container. Handlers are
+// scoped to `el` (delegated via closest), so the bar popover and a fresh overlay
+// element each get their own binding with no cross-leak; re-rendering innerHTML
+// keeps the container listeners intact.
+export function bindQueueList(el) {
+  let dragOi = null;
+  const clearDrop = () => el.querySelectorAll('.pq-drop-above, .pq-drop-below')
+    .forEach(x => x.classList.remove('pq-drop-above', 'pq-drop-below'));
+  el.addEventListener('click', e => {
+    const del = e.target.closest('[data-del]');
+    if (del) { removeAt(+del.dataset.del); return; }
+    const row = e.target.closest('[data-oi]');
+    if (row) jumpTo(+row.dataset.oi);
+  });
+  el.addEventListener('dragstart', e => {
+    const w = e.target.closest('.pq-rowwrap');
+    if (!w) return;
+    dragOi = +w.dataset.oi;
+    e.dataTransfer.effectAllowed = 'move';
+    w.classList.add('pq-dragging');
+  });
+  el.addEventListener('dragend', e => {
+    e.target.closest('.pq-rowwrap')?.classList.remove('pq-dragging');
+    clearDrop();
+    dragOi = null;
+  });
+  el.addEventListener('dragover', e => {
+    if (dragOi === null) return;
+    const w = e.target.closest('.pq-rowwrap');
+    if (!w) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const r = w.getBoundingClientRect();
+    clearDrop();
+    w.classList.add(e.clientY > r.top + r.height / 2 ? 'pq-drop-below' : 'pq-drop-above');
+  });
+  el.addEventListener('drop', e => {
+    if (dragOi === null) return;
+    const w = e.target.closest('.pq-rowwrap');
+    if (!w) return;
+    e.preventDefault();
+    const r = w.getBoundingClientRect();
+    moveInOrder(dragOi, +w.dataset.oi + (e.clientY > r.top + r.height / 2 ? 1 : 0));
+  });
+}
+
 // ---------- player bar DOM ----------
 function renderBar() {
   // Hide the whole bar when nothing is loaded; show it once a track is current.
@@ -274,22 +350,28 @@ function syncControls() {
   if (q) { const n = order.length; q.classList.toggle('has-queue', n > 1); }
 }
 
-// Build the up-next popover from the current play order.
-function renderQueue() {
-  const pop = $('#pb-queue-pop');
-  if (!pop) return;
-  if (!order.length) { pop.innerHTML = '<div class="pq-empty">Nothing queued</div>'; return; }
+// Up-next list markup from the current play order. Shared by the bar popover and
+// the full-screen now-playing overlay (both inject it, both bind via bindQueueList).
+export function queueRowsHtml() {
+  if (!order.length) return '<div class="pq-empty">Nothing queued</div>';
   const rows = order.map((qi, oi) => {
     const it = queue[qi];
     const cur = oi === orderPos;
-    return `<button class="pq-row${cur ? ' is-current' : ''}" data-oi="${oi}">
-      <span class="pq-ix">${cur ? '<svg class="pq-eq"><use href="#i-volume"/></svg>' : oi + 1}</span>
-      ${it.art ? `<img class="pq-art" src="${esc(it.art)}" alt="">` : '<span class="pq-art pq-art-ph"></span>'}
-      <span class="pq-meta"><span class="pq-name">${esc(it.name || it.uri)}</span>
-      <span class="pq-sub">${esc(it.artists || '')}</span></span></button>`;
+    return `<div class="pq-rowwrap" draggable="true" data-oi="${oi}">
+      <button class="pq-row${cur ? ' is-current' : ''}" data-oi="${oi}">
+        <span class="pq-ix">${cur ? '<svg class="pq-eq"><use href="#i-volume"/></svg>' : oi + 1}</span>
+        ${it.art ? `<img class="pq-art" src="${esc(it.art)}" alt="">` : '<span class="pq-art pq-art-ph"></span>'}
+        <span class="pq-meta"><span class="pq-name">${esc(it.name || it.uri)}</span>
+        <span class="pq-sub">${esc(it.artists || '')}</span></span></button>
+      <button class="pq-del" data-del="${oi}" aria-label="Remove from queue" title="Remove"><svg><use href="#i-x"/></svg></button>
+    </div>`;
   }).join('');
-  pop.innerHTML = `<div class="pq-head">Up next${shuffle ? ' · shuffled' : ''} · ${order.length} track${order.length > 1 ? 's' : ''}</div>
+  return `<div class="pq-head">Up next${shuffle ? ' · shuffled' : ''} · ${order.length} track${order.length > 1 ? 's' : ''}</div>
     <div class="pq-list">${rows}</div>`;
+}
+function renderQueue() {
+  const pop = $('#pb-queue-pop');
+  if (pop) pop.innerHTML = queueRowsHtml();
 }
 
 export function bindBarControls() {
@@ -312,10 +394,7 @@ export function bindBarControls() {
     pop.hidden = !open;
     qBtn.classList.toggle('is-active', open);
   });
-  pop.addEventListener('click', e => {
-    const row = e.target.closest('[data-oi]');
-    if (row) jumpTo(+row.dataset.oi);
-  });
+  bindQueueList(pop);
   document.addEventListener('click', e => {
     if (!pop.hidden && !pop.contains(e.target) && e.target !== qBtn && !qBtn.contains(e.target)) {
       pop.hidden = true; qBtn.classList.remove('is-active');

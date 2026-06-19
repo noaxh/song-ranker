@@ -13,6 +13,7 @@ import * as stats from './stats.js';
 import * as home from './home.js';
 import * as playlist from './playlist.js';
 import * as player from './player.js';
+import * as nowplaying from './nowplaying.js';
 import * as dnd from './dnd.js';
 import * as lib from './library.js';
 import { toast, ctxMenu, shortcutsModal, confirm, openModal } from './ui.js';
@@ -640,6 +641,9 @@ compare.init();
 home.init();
 playlist.init();
 player.bindBarControls();
+// Bar artwork / title → open the full-screen now-playing overlay.
+$('#pb-art')?.addEventListener('click', () => nowplaying.open());
+$('.pb-meta')?.addEventListener('click', () => nowplaying.open());
 // Player-bar "more" button → the same right-click song menu, on the current track.
 $('#pb-more')?.addEventListener('click', e => {
   const uri = player.currentUri();

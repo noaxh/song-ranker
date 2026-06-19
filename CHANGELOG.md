@@ -4,6 +4,18 @@ All notable changes to Song Ranker are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project aims for
 [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-06-19
+
+### Added
+- **Reorder and remove tracks in the queue.** The up-next popover now supports
+  drag-to-reorder and a per-row remove (✕). Removing the track that's playing skips
+  to the next one (or stops at the end of the queue), and a removed track stays
+  gone — toggling shuffle can no longer bring it back.
+- **Full-screen now-playing.** Click the player-bar artwork or title to open a
+  full-screen view with large album art, transport controls, a live seek bar, and
+  the up-next queue (sharing the same drag-reorder and remove). Esc or the close
+  button collapses it. (Synced lyrics will land here in a later update.)
+
 ## [1.3.2] - 2026-06-16
 
 ### Added
